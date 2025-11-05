@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  web-ui:
+    build:
+      context: ./web-ui
+    ports:
+      - "${WEB_UI_PORT}:${WEB_UI_PORT}"
+    env_file:
+      - ./.env
+    environment:
+      PORT: ${WEB_UI_PORT}
+      API_URL: ${API_URL}
+    restart: always

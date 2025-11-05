@@ -3,9 +3,9 @@ version: '3.9'
 services:
   web-ui:
     build:
-      context: ./web-ui
+      context: ./services/web-ui
     ports:
-      - "${WEB_UI_PORT}:${WEB_UI_PORT}"
+      - "${WEB_UI_PORT}:3000"
     env_file:
       - ./.env
     environment:

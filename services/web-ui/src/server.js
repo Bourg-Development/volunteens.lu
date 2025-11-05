@@ -5,7 +5,7 @@ const config = require('./config/environment');
 const app = require('./app');
 
 // Get port from environment or default to 3000
-const port = config.web_server.port || 3000;
+const port = 3000;
 
 // Set port in Express
 app.set('port', port);

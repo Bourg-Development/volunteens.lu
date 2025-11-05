@@ -1,0 +1,202 @@
+<% title = "Contact" %>
+<link rel="stylesheet" href="/static/stylesheets/pages/contact.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Contact Section -->
+<section class="contact-section">
+    <div class="contact-container">
+        <!-- Contact Form -->
+        <div class="contact-form-wrapper slide-in-left">
+            <h2>Send us a Message</h2>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Full Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="Max Musterman">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="max@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+352 6xx xxx xxx">
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject <span class="required">*</span></label>
+                    <input type="text" id="subject" name="subject" required placeholder="How can we help you?">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message <span class="required">*</span></label>
+                    <textarea id="message" name="message" rows="6" required placeholder="Tell us more about your inquiry..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-text">Send Message</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="material-symbols-outlined spinning">progress_activity</span>
+                        Sending...
+                    </span>
+                </button>
+
+                <div class="form-message" id="formMessage"></div>
+            </form>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="contact-info-wrapper slide-in-right">
+            <h2>Contact Information</h2>
+
+            <div class="contact-info-cards">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <span class="material-symbols-outlined">location_on</span>
+                    </div>
+                    <div class="info-content">
+                        <h3>Volunteens</h3>
+
+
+                        <p>4 Rue du Parc<br>L-1616 Luxembourg<br>Luxembourg</p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">
+                        <span class="material-symbols-outlined">mail</span>
+                    </div>
+                    <div class="info-content">
+                        <h3>Mail</h3>
+                        <p>
+                            <a href="mailto:info@volunteens.lu">info@volunteens.lu</a><br>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">
+                        <span class="material-symbols-outlined">call</span>
+                    </div>
+                    <div class="info-content">
+                        <h3>Phone</h3>
+                        <p>
+                            <a href="#">+352 6xx xxx xxx</a><br>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="social-links">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a href="#" class="social-icon twitter" aria-label="Twitter" title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-icon linkedin" aria-label="LinkedIn" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="social-icon facebook" aria-label="Facebook" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-icon instagram" aria-label="Instagram" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-icon youtube" aria-label="YouTube" title="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section (Optional) -->
+<section class="map-section fade-in">
+    <div class="map-container">
+        <div class="map-placeholder">
+            <span class="material-symbols-outlined">map</span>
+            <p>Lorem Ipsum</p>
+            <!-- Replace with actual map embed -->
+            <!-- <iframe src="YOUR_GOOGLE_MAPS_EMBED_URL" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe> -->
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section" id="faq">
+    <div class="faq-container">
+        <h2 class="section-title fade-in">Frequently Asked Questions</h2>
+        <p class="faq-intro fade-in">Have questions? We've got answers! Find the most common questions below.</p>
+
+        <div class="faq-accordion">
+            <div class="faq-accordion-item fade-in">
+                <button class="faq-question">
+                    <span>Lorem ipsum dolor sit amet consectetur?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam quis nostrud exercitation.</p>
+                </div>
+            </div>
+
+            <div class="faq-accordion-item fade-in">
+                <button class="faq-question">
+                    <span>Adipiscing elit sed do eiusmod?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                </div>
+            </div>
+
+            <div class="faq-accordion-item fade-in">
+                <button class="faq-question">
+                    <span>Tempor incididunt ut labore et dolore?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error.</p>
+                </div>
+            </div>
+
+            <div class="faq-accordion-item fade-in">
+                <button class="faq-question">
+                    <span>Magna aliqua ut enim ad minim?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Sit voluptatem accusantium doloremque laudantium totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                </div>
+            </div>
+
+            <div class="faq-accordion-item fade-in">
+                <button class="faq-question">
+                    <span>Veniam quis nostrud exercitation ullamco?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+                </div>
+            </div>
+
+            <div class="faq-accordion-item fade-in">
+                <button class="faq-question">
+                    <span>Laboris nisi ut aliquip ex ea commodo?</span>
+                    <span class="material-symbols-outlined faq-icon">expand_more</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Neque porro quisquam est qui dolorem ipsum quia dolor sit amet consectetur adipisci velit sed quia non numquam eius modi tempora incidunt ut labore et dolore.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-cta fade-in">
+            <p>Still have questions? <a href="/contact">Get in touch with us</a> and we'll be happy to help!</p>
+        </div>
+    </div>
+</section>
+
+<script src="/static/javascript/pages/contact.js"></script>

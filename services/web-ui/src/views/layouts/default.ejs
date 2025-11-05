@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'NO TITLE' %> | Volunteens  </title>
+
+    <!-- External Resources -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <!-- Common Styles -->
+    <link rel="stylesheet" href="/static/stylesheets/common/variables.css">
+    <link rel="stylesheet" href="/static/stylesheets/common/reset.css">
+    <link rel="stylesheet" href="/static/stylesheets/common/navbar.css">
+    <link rel="stylesheet" href="/static/stylesheets/common/footer.css">
+    <link rel="stylesheet" href="/static/stylesheets/common/buttons.css">
+
+    <!-- Page Specific Styles -->
+    <%- defineContent('styles') %>
+</head>
+<body>
+<!-- Navigation -->
+<%- include('../partials/navbar.ejs') %>
+
+<!-- Main Content -->
+<main>
+    <%- body %>
+</main>
+
+<!-- Footer -->
+<%- include('../partials/footer') %>
+
+<!-- Common Scripts -->
+<script src="/static/javascript/common/animations.js"></script>
+<script src="/static/javascript/common/navbar.js"></script>
+
+<!-- Page Specific Scripts -->
+<%- defineContent('scripts') %>
+</body>
+</html>

@@ -279,49 +279,62 @@
     font-size: 0.95rem;
 }
 
-/* About CTA Section */
-.about-cta {
+/* CTA Sections */
+.cta-section {
     padding: var(--spacing-3xl) var(--spacing-lg);
-    background: var(--gradient-primary);
-    text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
-.about-cta-content {
+.cta-helpers {
+    background: linear-gradient(135deg, var(--color-primary), #0767a1);
+}
+
+.cta-students {
+    background: linear-gradient(135deg, var(--color-secondary), #5eb840);
+}
+
+.cta-container {
     max-width: 800px;
     margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
 }
 
-.about-cta h2 {
+.cta-container h2 {
     font-size: clamp(2rem, 4vw, 3rem);
     color: white;
     margin-bottom: var(--spacing-md);
     font-weight: var(--font-weight-semibold);
 }
 
-.about-cta p {
+.cta-container p {
     font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: var(--spacing-xl);
     line-height: 1.6;
 }
 
-.about-cta .cta-buttons {
-    display: flex;
-    gap: var(--spacing-sm);
-    justify-content: center;
-    flex-wrap: wrap;
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
 }
 
-.about-cta .btn-secondary {
-    background: white;
-    color: var(--color-primary);
-    border: 2px solid white;
+.bubble-1 {
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    right: -100px;
 }
 
-.about-cta .btn-secondary:hover {
-    background: transparent;
-    color: white;
-    border-color: white;
+.bubble-2 {
+    width: 200px;
+    height: 200px;
+    bottom: -100px;
+    left: -50px;
 }
 
 /* Responsive Design */

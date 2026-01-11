@@ -16,20 +16,20 @@ async function getSetting(key) {
 
         const result = await response.json();
         if (!result.success) {
-            logger.error('Admin service error:', result.error);
+            logger.error('Admin service error:' + result.error);
             return null;
         }
         return result.value;
     } catch (err) {
-        logger.error('Failed to get setting:', err.message);
+        logger.error('Failed to get setting:' + err.message);
         return null;
     }
 }
 
-async function getHourlyRate() {
-    const rate = await getSetting('hourly_rate');
+async function getHourlyRateRecommendation() {
+    const rate = await getSetting('hourly_rate_recommendation');
     if (rate === null) {
-        logger.warn('Could not fetch hourly rate, using default 15.00');
+        logger.warn('Could not fetch hourly rate recommendation, using default 15.00');
         return 15.00;
     }
     return parseFloat(rate);
@@ -37,5 +37,5 @@ async function getHourlyRate() {
 
 module.exports = {
     getSetting,
-    getHourlyRate,
+    getHourlyRateRecommendation,
 };

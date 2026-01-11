@@ -153,10 +153,14 @@ exports.listMyEvents = async (req, res) => {
 // Create event (organization)
 exports.create = async (req, res) => {
     try {
-        const { title, description, location, address, capacity, requirements, contactEmail, contactPhone, signupDeadline, shifts } = req.body;
+        const { title, description, location, address, capacity, hourlyRate, requirements, contactEmail, contactPhone, signupDeadline, shifts } = req.body;
 
         if (!title) {
             return res.status(400).json({ success: false, error: 'Title is required' });
+        }
+
+        if (!hourlyRate) {
+            return res.status(400).json({ success: false, error: 'Hourly rate is required' });
         }
 
         if (!shifts || !Array.isArray(shifts) || shifts.length === 0) {
@@ -180,6 +184,7 @@ exports.create = async (req, res) => {
             location: location || null,
             address: address || null,
             capacity: capacity ? parseInt(capacity, 10) : null,
+            hourlyRate,
             requirements: requirements || null,
             contactEmail: contactEmail || null,
             contactPhone: contactPhone || null,
@@ -227,7 +232,7 @@ exports.update = async (req, res) => {
             return res.status(403).json({ success: false, error: 'Not authorized to edit this event' });
         }
 
-        const { title, description, location, address, capacity, requirements, contactEmail, contactPhone, signupDeadline, shifts } = req.body;
+        const { title, description, location, address, capacity, hourlyRate, requirements, contactEmail, contactPhone, signupDeadline, shifts } = req.body;
 
         // Validate shifts if provided
         if (shifts) {
@@ -251,6 +256,7 @@ exports.update = async (req, res) => {
             location: location !== undefined ? location : event.location,
             address: address !== undefined ? address : event.address,
             capacity: capacity !== undefined ? (capacity ? parseInt(capacity, 10) : null) : event.capacity,
+            hourlyRate: hourlyRate || event.hourlyRate,
             requirements: requirements !== undefined ? requirements : event.requirements,
             contactEmail: contactEmail !== undefined ? contactEmail : event.contactEmail,
             contactPhone: contactPhone !== undefined ? contactPhone : event.contactPhone,

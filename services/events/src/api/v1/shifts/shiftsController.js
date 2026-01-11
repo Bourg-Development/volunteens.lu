@@ -328,6 +328,7 @@ exports.generateInvoices = async (req, res) => {
                     eventId: event.id,
                     eventTitle: event.title,
                     signupId: signup.id,
+                    hourlyRate: event.hourlyRate,
                     totalHours,
                     attendedShifts,
                 });

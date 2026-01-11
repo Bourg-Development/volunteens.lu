@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../database');
 
 const SETTING_KEYS = {
-    HOURLY_RATE: 'hourly_rate',
+    HOURLY_RATE_RECOMMENDATION: 'hourly_rate_recommendation',
     B2B_SUPPORT_EMAIL: 'b2b_support_email',
 };
 
@@ -36,7 +36,7 @@ const Settings = sequelize.define('Settings', {
 
 const DEFAULT_SETTINGS = [
     {
-        key: SETTING_KEYS.HOURLY_RATE,
+        key: SETTING_KEYS.HOURLY_RATE_RECOMMENDATION,
         value: '15.00',
         description: 'Hourly rate for volunteer work (EUR)',
     },

@@ -1,5 +1,6 @@
 const servicesConfig = require('../config/services');
 const logger = require('../utils/logger');
+const adminClient = require('../services/adminClient')
 const PDFDocument = require('pdfkit');
 
 const EVENTS_API = `${servicesConfig.eventsInternal}/api/v1`;
@@ -42,10 +43,12 @@ exports.orgEvents = async (req, res) => {
 };
 
 // Show create event form
-exports.orgCreateForm = (req, res) => {
+exports.orgCreateForm = async (req, res) => {
+    const payRecommendation = await adminClient.getHourlyRateRecommendation();
     res.render('pages/events/org-create', {
         title: 'Create Event',
         user: req.user,
+        payRecommendation
     });
 };
 

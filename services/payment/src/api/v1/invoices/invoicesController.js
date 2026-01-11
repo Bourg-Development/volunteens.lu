@@ -1,5 +1,4 @@
 const { Invoice, INVOICE_STATUSES } = require('../../../database');
-const { getHourlyRate } = require('../../../services/adminClient');
 const { getUserProfile } = require('../../../services/authClient');
 const { sendInvoiceNotification } = require('../../../services/emailClient');
 const { generateInvoiceNumber, calculateHours, calculateAmount } = require('../../../services/invoiceService');
@@ -103,6 +102,7 @@ exports.createInvoice = async (req, res) => {
             eventId,
             eventTitle,
             signupId,
+            hourlyRate,
             totalHours,
             attendedShifts,
         } = req.body;
@@ -132,9 +132,6 @@ exports.createInvoice = async (req, res) => {
                 invoice: existing,
             });
         }
-
-        // Fetch hourly rate from admin service
-        const hourlyRate = await getHourlyRate();
 
         // Calculate amount from total hours
         const amount = calculateAmount(totalHours, hourlyRate);

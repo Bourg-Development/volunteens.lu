@@ -41,6 +41,10 @@ const Event = sequelize.define('Event', {
         allowNull: true,
         comment: 'Max number of signups, null = unlimited',
     },
+    hourlyRate: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+    },
     status: {
         type: DataTypes.ENUM(Object.values(EVENT_STATUSES)),
         allowNull: false,

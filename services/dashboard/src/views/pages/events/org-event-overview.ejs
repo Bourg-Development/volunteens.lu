@@ -104,6 +104,15 @@
                     </div>
                 </div>
             <% } %>
+            <% if (event.hourlyRate) { %>
+                <div class="detail-item">
+                    <span class="material-symbols-outlined">alarm</span>
+                    <div>
+                        <div class="detail-label">Student rate (€)</div>
+                        <div class="detail-value"><%= event.hourlyRate %></div>
+                    </div>
+                </div>
+            <% } %>
             <% if (event.signupDeadline) { %>
                 <div class="detail-item">
                     <span class="material-symbols-outlined">alarm</span>
@@ -546,6 +555,15 @@
                 <div class="form-group">
                     <label for="edit-address">Full Address</label>
                     <textarea id="edit-address" name="address" class="form-control" rows="2"><%= event.address || '' %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-hourlyRate">Student rate (€)</label>
+                    <input type="number" id="edit-hourlyRate" name="hourlyRate" class="form-control"
+                           value="<%= event.hourlyRate || '' %>"
+                           step="0.01"
+                           min="0"
+                    >
                 </div>
 
                 <div class="form-group">

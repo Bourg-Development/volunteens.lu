@@ -1,0 +1,390 @@
+<%
+    // Get all assignments across all shifts
+    const allAssignments = (shifts || []).flatMap(shift => shift.assignments || []);
+
+    // Check if there are any attended students
+    const hasAttendedStudents = allAssignments.some(a => a.status === 'attended');
+
+    // Check if there are any assignments still in "assigned" status (not yet marked)
+    const hasPendingAssignments = allAssignments.some(a => a.status === 'assigned');
+
+    // All assignments must be marked (attended or no_show) before confirming
+    const allMarked = allAssignments.length > 0 && !hasPendingAssignments;
+
+    // Check if we're on or after the first event day (only enforced in production)
+    let canConfirmAttendance = true;
+    if (typeof isProduction !== 'undefined' && isProduction) {
+        canConfirmAttendance = false;
+        const eventShifts = shifts || [];
+        if (eventShifts.length > 0) {
+            const sortedShifts = [...eventShifts].sort((a, b) => a.date.localeCompare(b.date));
+            const firstShiftDate = new Date(sortedShifts[0].date);
+            firstShiftDate.setHours(0, 0, 0, 0);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            canConfirmAttendance = today >= firstShiftDate;
+        }
+    }
+
+    // Button enabled only if: has attended students, all assignments marked, and can confirm (date check)
+    const buttonEnabled = hasAttendedStudents && allMarked && canConfirmAttendance;
+
+    // Determine tooltip message
+    let tooltipMessage = '';
+    if (!canConfirmAttendance) {
+        tooltipMessage = 'Available from the first day of the event';
+    } else if (hasPendingAssignments) {
+        tooltipMessage = 'Mark all assignments as attended or no-show first';
+    } else if (!hasAttendedStudents) {
+        tooltipMessage = 'No students marked as attended';
+    }
+%>
+<div class="page-header">
+    <div>
+        <h1>Attendance</h1>
+        <p class="page-subtitle"><%= event.title %></p>
+    </div>
+    <div class="page-header-actions">
+        <a href="/events/<%= event.id %>/attendance/download" class="btn btn-secondary" title="Download attendance list as PDF">
+            <span class="material-symbols-outlined">download</span>
+            Download List
+        </a>
+        <form action="/events/<%= event.id %>/generate-invoices" method="POST" class="inline-form"
+              onsubmit="return confirm('Confirm attendances for all students marked as attended?');">
+            <button type="submit" class="btn btn-success" <%= buttonEnabled ? '' : 'disabled' %>
+                    <% if (tooltipMessage) { %>title="<%= tooltipMessage %>"<% } %>>
+                <span class="material-symbols-outlined">fact_check</span>
+                Confirm Attendances
+            </button>
+        </form>
+    </div>
+</div>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <%= typeof msg !== 'undefined' ? msg : 'Operation successful' %>
+    </div>
+<% } %>
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (shifts.length === 0) { %>
+    <div class="empty-state">
+        <span class="material-symbols-outlined">event_busy</span>
+        <h3>No Shifts</h3>
+        <p>This event doesn't have any shifts yet.</p>
+        <a href="/events/<%= event.id %>/shifts" class="btn btn-primary">Add Shifts</a>
+    </div>
+<% } else { %>
+<div class="attendance-list">
+    <%
+        const sortedShifts = [...shifts].sort((a, b) => {
+            if (a.date !== b.date) return a.date.localeCompare(b.date);
+            return a.startTime.localeCompare(b.startTime);
+        });
+    %>
+    <% sortedShifts.forEach((shift, index) => {
+        const assignments = shift.assignments || [];
+        const assigned = assignments.filter(a => a.status === 'assigned');
+        const attended = assignments.filter(a => a.status === 'attended');
+        const noShow = assignments.filter(a => a.status === 'no_show');
+
+        const shiftDate = new Date(shift.date);
+        const dateStr = shiftDate.toLocaleDateString('en-GB', {
+            weekday: 'long', day: 'numeric', month: 'long'
+        });
+
+        const [sH, sM] = shift.startTime.split(':').map(Number);
+        const [eH, eM] = shift.endTime.split(':').map(Number);
+        const hours = ((eH * 60 + eM) - (sH * 60 + sM)) / 60;
+    %>
+        <div class="shift-attendance-card" data-shift-id="<%= shift.id %>">
+            <div class="shift-header">
+                <div class="shift-info">
+                    <h3><%= dateStr %></h3>
+                    <span class="shift-time">
+                        <%= shift.startTime.substring(0, 5) %> - <%= shift.endTime.substring(0, 5) %>
+                        (<%= hours.toFixed(1) %>h)
+                    </span>
+                </div>
+                <div class="shift-stats">
+                    <span class="stat attended"><%= attended.length %> attended</span>
+                    <span class="stat no-show"><%= noShow.length %> no-show</span>
+                    <span class="stat assigned"><%= assigned.length %> pending</span>
+                </div>
+            </div>
+
+            <% if (assignments.length === 0) { %>
+                <div class="no-assignments">
+                    <span class="material-symbols-outlined">person_off</span>
+                    No students assigned to this shift
+                </div>
+            <% } else { %>
+                <div class="attendance-table-wrapper">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% assignments.forEach(assignment => { %>
+                                <tr class="<%= assignment.status %>">
+                                    <td class="student-cell">
+                                        <span class="material-symbols-outlined">person</span>
+                                        <%= assignment.signup?.studentName || assignment.signup?.studentEmail || 'Student' %>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-<%= assignment.status %>"><%= assignment.status.replace('_', ' ') %></span>
+                                    </td>
+                                    <td class="actions-cell">
+                                        <% if (assignment.status !== 'attended') { %>
+                                            <button type="button" class="btn btn-sm btn-success mark-btn"
+                                                    data-assignment-id="<%= assignment.id %>"
+                                                    data-status="attended"
+                                                    title="Mark as Attended">
+                                                <span class="material-symbols-outlined">check</span>
+                                            </button>
+                                        <% } %>
+                                        <% if (assignment.status !== 'no_show') { %>
+                                            <button type="button" class="btn btn-sm btn-danger mark-btn"
+                                                    data-assignment-id="<%= assignment.id %>"
+                                                    data-status="no_show"
+                                                    title="Mark as No Show">
+                                                <span class="material-symbols-outlined">close</span>
+                                            </button>
+                                        <% } %>
+                                        <% if (assignment.status !== 'assigned') { %>
+                                            <button type="button" class="btn btn-sm btn-secondary mark-btn"
+                                                    data-assignment-id="<%= assignment.id %>"
+                                                    data-status="assigned"
+                                                    title="Reset to Assigned">
+                                                <span class="material-symbols-outlined">undo</span>
+                                            </button>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    <% }); %>
+</div>
+
+<% } %>
+
+<style>
+.page-subtitle {
+    color: var(--color-text-muted);
+    margin: var(--spacing-xs) 0 0 0;
+    font-size: 0.95rem;
+}
+
+.page-header-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.inline-form {
+    display: inline;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.attendance-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.shift-attendance-card {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.shift-attendance-card .shift-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--color-background-alt);
+    border-bottom: 1px solid rgba(14, 47, 82, 0.08);
+}
+
+.shift-attendance-card .shift-info h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-dark);
+}
+
+.shift-attendance-card .shift-time {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.shift-stats {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.shift-stats .stat {
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-medium);
+}
+
+.shift-stats .stat.attended {
+    color: #27ae60;
+}
+
+.shift-stats .stat.no-show {
+    color: #e74c3c;
+}
+
+.shift-stats .stat.assigned {
+    color: var(--color-text-muted);
+}
+
+.no-assignments {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    color: var(--color-text-muted);
+}
+
+.attendance-table-wrapper {
+    overflow-x: auto;
+}
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.attendance-table th,
+.attendance-table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid rgba(14, 47, 82, 0.05);
+}
+
+.attendance-table th {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.attendance-table tr.attended {
+    background: rgba(39, 174, 96, 0.05);
+}
+
+.attendance-table tr.no_show {
+    background: rgba(231, 76, 60, 0.05);
+}
+
+.student-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.student-cell .material-symbols-outlined {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+}
+
+.actions-cell {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.mark-btn {
+    padding: 4px 8px !important;
+}
+
+.mark-btn .material-symbols-outlined {
+    font-size: 1rem;
+}
+
+.badge-assigned {
+    background: rgba(14, 47, 82, 0.1);
+    color: var(--color-dark);
+}
+
+.badge-no_show {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+    .shift-attendance-card .shift-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .shift-stats {
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+
+    .actions-cell {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const eventId = '<%= event.id %>';
+
+    document.querySelectorAll('.mark-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const assignmentId = this.dataset.assignmentId;
+            const status = this.dataset.status;
+            const shiftCard = this.closest('.shift-attendance-card');
+            const shiftId = shiftCard.dataset.shiftId;
+
+            try {
+                const response = await fetch(`/events/${eventId}/shifts/${shiftId}/attendance`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        assignments: [{ id: assignmentId, status }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update');
+                }
+
+                // Reload to show updated status
+                window.location.reload();
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Failed to update attendance');
+            }
+        });
+    });
+});
+</script>

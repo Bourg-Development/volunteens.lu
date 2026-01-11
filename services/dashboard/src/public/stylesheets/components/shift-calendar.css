@@ -1,0 +1,422 @@
+/* Shift Calendar Component */
+.shift-calendar-container {
+    margin-bottom: var(--spacing-md);
+}
+
+.week-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.week-nav {
+    background: var(--color-background-alt);
+    border: 1px solid rgba(14, 47, 82, 0.15);
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.week-nav:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.week-label {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-dark);
+    min-width: 200px;
+    text-align: center;
+}
+
+.shift-calendar {
+    background: white;
+    border-radius: var(--radius-sm);
+    border: 2px solid rgba(14, 47, 82, 0.15);
+    overflow: hidden;
+    user-select: none;
+}
+
+.shift-calendar-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+}
+
+/* Header row */
+.day-header {
+    text-align: center;
+    padding: var(--spacing-sm) var(--spacing-xs);
+    background: var(--color-background-alt);
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.85rem;
+    color: var(--color-dark);
+    border-bottom: 1px solid rgba(14, 47, 82, 0.1);
+}
+
+.day-header.today {
+    background: var(--color-primary);
+    color: white;
+}
+
+.day-header .day-name {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.day-header .day-date {
+    display: block;
+    font-size: 1rem;
+}
+
+.time-header {
+    background: var(--color-background-alt);
+    border-bottom: 1px solid rgba(14, 47, 82, 0.1);
+}
+
+/* Time labels column */
+.time-label {
+    padding: 0 var(--spacing-xs);
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    text-align: right;
+    border-right: 1px solid rgba(14, 47, 82, 0.08);
+    background: var(--color-background-alt);
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Time slots */
+.day-column {
+    position: relative;
+    border-right: 1px solid rgba(14, 47, 82, 0.05);
+}
+
+.day-column:last-child {
+    border-right: none;
+}
+
+.time-slot {
+    height: 20px;
+    border-bottom: 1px solid rgba(14, 47, 82, 0.05);
+    cursor: crosshair;
+    transition: background var(--transition-fast);
+}
+
+.time-slot:hover {
+    background: rgba(9, 135, 201, 0.08);
+}
+
+.time-slot.hour-mark {
+    border-top: 2px solid rgba(14, 47, 82, 0.2);
+}
+
+/* Shift blocks */
+.shift-block {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    background: var(--gradient-primary);
+    border-radius: 6px;
+    color: white;
+    font-size: 0.7rem;
+    z-index: 10;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+}
+
+.shift-block:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.shift-block .shift-body {
+    flex: 1;
+    padding: 4px 6px;
+    cursor: move;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 20px;
+}
+
+.shift-block .shift-time {
+    font-weight: var(--font-weight-semibold);
+    white-space: nowrap;
+}
+
+.shift-block .shift-duration {
+    font-size: 0.65rem;
+    opacity: 0.9;
+}
+
+/* Resize handles */
+.resize-handle {
+    height: 6px;
+    cursor: ns-resize;
+    background: transparent;
+    transition: background var(--transition-fast);
+}
+
+.resize-handle-top {
+    border-radius: 6px 6px 0 0;
+}
+
+.resize-handle-bottom {
+    border-radius: 0 0 6px 6px;
+}
+
+.shift-block:hover .resize-handle {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.resize-handle:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Active dragging/resizing state */
+.shift-block.dragging,
+.shift-block.resizing {
+    opacity: 0.8;
+    box-shadow: var(--shadow-lg);
+}
+
+body.shift-dragging {
+    cursor: move !important;
+    user-select: none;
+}
+
+body.shift-resizing {
+    cursor: ns-resize !important;
+    user-select: none;
+}
+
+.shift-block .edit-btn,
+.shift-block .delete-btn {
+    position: absolute;
+    top: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    color: white;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    z-index: 5;
+}
+
+.shift-block .edit-btn {
+    right: 22px;
+}
+
+.shift-block .edit-btn .material-symbols-outlined {
+    font-size: 12px;
+}
+
+.shift-block .delete-btn {
+    right: 2px;
+}
+
+.shift-block:hover .edit-btn,
+.shift-block:hover .delete-btn {
+    display: flex;
+}
+
+.shift-block .edit-btn:hover {
+    background: rgba(9, 135, 201, 0.8);
+}
+
+.shift-block .delete-btn:hover {
+    background: rgba(231, 76, 60, 0.8);
+}
+
+/* Edit Modal */
+.shift-edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.shift-edit-content {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    min-width: 280px;
+    box-shadow: var(--shadow-lg);
+}
+
+.shift-edit-content h4 {
+    margin: 0 0 var(--spacing-xs) 0;
+    color: var(--color-dark);
+}
+
+.shift-edit-date {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.shift-edit-row {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.shift-edit-row label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.shift-edit-row input[type="time"] {
+    padding: var(--spacing-sm);
+    border: 1px solid rgba(14, 47, 82, 0.2);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+}
+
+.shift-edit-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+}
+
+/* Drag preview */
+.drag-preview {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    background: var(--gradient-primary);
+    opacity: 0.5;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Dragging state */
+.shift-calendar.dragging .time-slot {
+    cursor: ns-resize;
+}
+
+/* Shift summary */
+.shift-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--color-background-alt);
+    border-radius: var(--radius-sm);
+    margin-top: var(--spacing-sm);
+    font-size: 0.9rem;
+}
+
+.shift-summary .shift-count {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+}
+
+.shift-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.shift-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: var(--color-background-alt);
+    border: 1px solid rgba(14, 47, 82, 0.1);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.8rem;
+}
+
+.shift-chip .remove-shift {
+    background: none;
+    border: none;
+    color: var(--color-error);
+    cursor: pointer;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .shift-calendar-grid {
+        grid-template-columns: 45px repeat(7, 1fr);
+    }
+
+    .day-header {
+        padding: var(--spacing-xs);
+        font-size: 0.75rem;
+    }
+
+    .day-header .day-name {
+        font-size: 0.6rem;
+    }
+
+    .day-header .day-date {
+        font-size: 0.85rem;
+    }
+
+    .time-label {
+        font-size: 0.6rem;
+        padding: 2px 4px;
+    }
+
+    .shift-block {
+        font-size: 0.6rem;
+        padding: 2px 4px;
+    }
+
+    .week-label {
+        font-size: 0.85rem;
+        min-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .shift-calendar-grid {
+        grid-template-columns: 35px repeat(7, 1fr);
+    }
+
+    .day-header .day-name {
+        display: none;
+    }
+
+    .week-selector {
+        flex-wrap: wrap;
+    }
+}

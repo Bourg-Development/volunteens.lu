@@ -1,0 +1,232 @@
+<a href="/events" class="btn btn-secondary" style="margin-bottom: var(--spacing-md);">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Back to Events
+</a>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <%= typeof msg !== 'undefined' ? msg : 'Operation successful' %>
+    </div>
+<% } %>
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<div class="event-details">
+    <h1><%= event.title %></h1>
+
+    <%
+        const shifts = event.shifts || [];
+        const sortedShifts = [...shifts].sort((a, b) => {
+            if (a.date !== b.date) return a.date.localeCompare(b.date);
+            return a.startTime.localeCompare(b.startTime);
+        });
+        const firstShift = sortedShifts[0];
+        const lastShift = sortedShifts[sortedShifts.length - 1];
+    %>
+
+    <div class="event-info-grid">
+        <div class="event-info-item">
+            <span class="material-symbols-outlined">calendar_today</span>
+            <div>
+                <div class="event-info-label">Date</div>
+                <div class="event-info-value">
+                    <% if (sortedShifts.length > 0) { %>
+                        <% if (firstShift.date === lastShift.date) { %>
+                            <%= new Date(firstShift.date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                        <% } else { %>
+                            <%= new Date(firstShift.date).toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                            -
+                            <%= new Date(lastShift.date).toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %>
+                        <% } %>
+                    <% } else { %>
+                        No dates scheduled
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="event-info-item">
+            <span class="material-symbols-outlined">schedule</span>
+            <div>
+                <div class="event-info-label">Shifts</div>
+                <div class="event-info-value">
+                    <%= sortedShifts.length %> shift(s)
+                </div>
+            </div>
+        </div>
+
+        <% if (event.location) { %>
+            <div class="event-info-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <div>
+                    <div class="event-info-label">Location</div>
+                    <div class="event-info-value"><%= event.location %></div>
+                </div>
+            </div>
+        <% } %>
+
+        <% if (event.capacity) { %>
+            <div class="event-info-item">
+                <span class="material-symbols-outlined">group</span>
+                <div>
+                    <div class="event-info-label">Spots Available</div>
+                    <div class="event-info-value"><%= event.capacity - (event.signupCount || 0) %> of <%= event.capacity %></div>
+                </div>
+            </div>
+        <% } %>
+
+        <% if (event.contactEmail) { %>
+            <div class="event-info-item">
+                <span class="material-symbols-outlined">mail</span>
+                <div>
+                    <div class="event-info-label">Contact</div>
+                    <div class="event-info-value"><%= event.contactEmail %></div>
+                </div>
+            </div>
+        <% } %>
+
+        <% if (event.contactPhone) { %>
+            <div class="event-info-item">
+                <span class="material-symbols-outlined">phone</span>
+                <div>
+                    <div class="event-info-label">Phone</div>
+                    <div class="event-info-value"><%= event.contactPhone %></div>
+                </div>
+            </div>
+        <% } %>
+
+        <% if (event.signupDeadline) { %>
+            <div class="event-info-item">
+                <span class="material-symbols-outlined">alarm</span>
+                <div>
+                    <div class="event-info-label">Signup Deadline</div>
+                    <div class="event-info-value" style="<%= new Date(event.signupDeadline) < new Date() ? 'color: #e74c3c;' : '' %>">
+                        <%= new Date(event.signupDeadline).toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                        <% if (new Date(event.signupDeadline) < new Date()) { %>
+                            (Passed)
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <% if (sortedShifts.length > 0) { %>
+        <div class="event-description">
+            <h3>Schedule</h3>
+            <div class="shifts-list">
+                <% sortedShifts.forEach(shift => { %>
+                    <div class="shift-item">
+                        <span class="material-symbols-outlined">event</span>
+                        <span class="shift-date">
+                            <%= new Date(shift.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) %>
+                        </span>
+                        <span class="shift-time">
+                            <%= shift.startTime.substring(0, 5) %> - <%= shift.endTime.substring(0, 5) %>
+                        </span>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    <% } %>
+
+    <% if (event.description) { %>
+        <div class="event-description">
+            <h3>About this event</h3>
+            <p><%= event.description %></p>
+        </div>
+    <% } %>
+
+    <% if (event.address) { %>
+        <div class="event-description">
+            <h3>Address</h3>
+            <p><%= event.address %></p>
+        </div>
+    <% } %>
+
+    <% if (event.requirements) { %>
+        <div class="event-description">
+            <h3>Requirements / What to Bring</h3>
+            <p><%= event.requirements %></p>
+        </div>
+    <% } %>
+
+    <div class="signup-form">
+        <%
+            const deadlinePassed = event.signupDeadline && new Date(event.signupDeadline) < new Date();
+            const eventFull = event.capacity && event.signupCount >= event.capacity;
+            const alreadySignedUp = typeof signup !== 'undefined' && signup && signup.status !== 'cancelled';
+        %>
+        <% if (alreadySignedUp) { %>
+            <h3>You're signed up!</h3>
+            <p>Status: <span class="badge badge-<%= signup.status %>"><%= signup.status %></span></p>
+            <form action="/event/<%= event.id %>/cancel" method="POST" style="margin-top: var(--spacing-md);">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel your signup?')">
+                    <span class="material-symbols-outlined">cancel</span>
+                    Cancel Signup
+                </button>
+            </form>
+        <% } else if (deadlinePassed) { %>
+            <h3>Signup Closed</h3>
+            <p>The signup deadline for this event has passed.</p>
+        <% } else if (eventFull) { %>
+            <h3>Event Full</h3>
+            <p>This event has reached its capacity. Please check back later for cancellations.</p>
+        <% } else { %>
+            <h3>Sign Up</h3>
+            <% if (event.signupDeadline) { %>
+                <p style="color: var(--color-text-muted); margin-bottom: var(--spacing-sm);">
+                    <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">alarm</span>
+                    Sign up before <%= new Date(event.signupDeadline).toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                </p>
+            <% } %>
+            <form action="/event/<%= event.id %>/signup" method="POST">
+                <div class="form-group">
+                    <label for="message">Message to organizer (optional)</label>
+                    <textarea id="message" name="message" class="form-control" rows="3"
+                              placeholder="Tell the organizer about yourself or ask questions..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    Sign Up for Event
+                </button>
+            </form>
+        <% } %>
+    </div>
+</div>
+
+<style>
+.shifts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.shift-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-background-alt);
+    border-radius: var(--radius-sm);
+}
+
+.shift-item .material-symbols-outlined {
+    color: var(--color-primary);
+    font-size: 1.2rem;
+}
+
+.shift-date {
+    font-weight: var(--font-weight-semibold);
+    min-width: 120px;
+}
+
+.shift-time {
+    color: var(--color-text-muted);
+}
+</style>

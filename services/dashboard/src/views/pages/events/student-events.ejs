@@ -1,0 +1,148 @@
+<div class="page-header">
+    <h1>Events</h1>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a href="/events?filter=upcoming" class="filter-tab <%= filter === 'upcoming' ? 'active' : '' %>">
+        <span class="material-symbols-outlined">event</span>
+        Upcoming
+    </a>
+    <a href="/events?filter=signed-up" class="filter-tab <%= filter === 'signed-up' ? 'active' : '' %>">
+        <span class="material-symbols-outlined">how_to_reg</span>
+        Signed Up
+    </a>
+    <a href="/events?filter=past" class="filter-tab <%= filter === 'past' ? 'active' : '' %>">
+        <span class="material-symbols-outlined">history</span>
+        Past
+    </a>
+</div>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <%= typeof msg !== 'undefined' ? msg : 'Operation successful' %>
+    </div>
+<% } %>
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (events.length === 0) { %>
+    <div class="empty-state">
+        <% if (filter === 'upcoming') { %>
+            <span class="material-symbols-outlined">event_busy</span>
+            <h3>No Upcoming Events</h3>
+            <p>Check back later for new volunteering opportunities!</p>
+        <% } else if (filter === 'signed-up') { %>
+            <span class="material-symbols-outlined">event_available</span>
+            <h3>No Upcoming Signups</h3>
+            <p>You haven't signed up for any upcoming events yet.</p>
+            <a href="/events?filter=upcoming" class="btn btn-primary" style="margin-top: .5rem">Browse Events</a>
+        <% } else { %>
+            <span class="material-symbols-outlined">history</span>
+            <h3>No Past Events</h3>
+            <p>You haven't attended any events yet.</p>
+        <% } %>
+    </div>
+<% } else { %>
+    <div class="events-grid">
+        <% events.forEach(event => { %>
+            <div class="card event-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title"><%= event.title %></h3>
+                        <div class="card-subtitle">
+                            <%
+                                // Get date range from shifts
+                                const shifts = event.shifts || [];
+                                if (shifts.length > 0) {
+                                    const sortedShifts = [...shifts].sort((a, b) => a.date.localeCompare(b.date));
+                                    const firstDate = new Date(sortedShifts[0].date);
+                                    const lastDate = new Date(sortedShifts[sortedShifts.length - 1].date);
+                                    const firstDateStr = firstDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+                                    if (sortedShifts[0].date === sortedShifts[sortedShifts.length - 1].date) {
+                            %>
+                                        <%= firstDateStr %> &middot; <%= shifts.length %> shift(s)
+                            <%
+                                    } else {
+                                        const lastDateStr = lastDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+                            %>
+                                        <%= firstDateStr %> - <%= lastDateStr %> &middot; <%= shifts.length %> shift(s)
+                            <%
+                                    }
+                                } else {
+                            %>
+                                    No shifts scheduled
+                            <%
+                                }
+                            %>
+                        </div>
+                    </div>
+                    <% if (event.signupStatus) { %>
+                        <span class="badge badge-<%= event.signupStatus %>"><%= event.signupStatus %></span>
+                    <% } %>
+                </div>
+
+                <% if (event.description) { %>
+                    <p class="card-body" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                        <%= event.description %>
+                    </p>
+                <% } %>
+
+                <div class="event-meta">
+                    <% if (event.location) { %>
+                        <span class="event-meta-item">
+                            <span class="material-symbols-outlined">location_on</span>
+                            <%= event.location %>
+                        </span>
+                    <% } %>
+                    <% if (filter === 'upcoming' && event.capacity) { %>
+                        <span class="event-meta-item">
+                            <span class="material-symbols-outlined">group</span>
+                            <%= event.signupCount || 0 %>/<%= event.capacity %> spots
+                        </span>
+                    <% } %>
+                </div>
+
+                <div class="card-actions">
+                    <% if (filter === 'upcoming') { %>
+                        <a href="/event/<%= event.id %>" class="btn btn-sm btn-primary">
+                            <span class="material-symbols-outlined">visibility</span>
+                            View & Sign Up
+                        </a>
+                    <% } else if (filter === 'signed-up') { %>
+                        <a href="/event/<%= event.id %>" class="btn btn-sm btn-secondary">
+                            <span class="material-symbols-outlined">visibility</span>
+                            View Details
+                        </a>
+                        <form action="/event/<%= event.id %>/cancel" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel your signup?')">
+                                <span class="material-symbols-outlined">cancel</span>
+                                Cancel
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <% if (event.signupStatus === 'attended') { %>
+                            <span class="event-completed">
+                                <span class="material-symbols-outlined">verified</span>
+                                Attended
+                            </span>
+                        <% } else if (event.signupStatus === 'no_show') { %>
+                            <span class="event-no-show">
+                                <span class="material-symbols-outlined">cancel</span>
+                                No Show
+                            </span>
+                        <% } else { %>
+                            <span class="event-status-text"><%= event.signupStatus %></span>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+<% } %>

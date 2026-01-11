@@ -1,0 +1,23 @@
+{
+  "name": "volunteens-payment",
+  "version": "1.0.0",
+  "description": "Payment service for Volunteens",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^5.2.1",
+    "pdfkit": "^0.15.0",
+    "pg": "^8.16.3",
+    "pino": "^9.6.0",
+    "pino-http": "^10.4.0",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

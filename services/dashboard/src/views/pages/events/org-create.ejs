@@ -1,0 +1,106 @@
+<div class="page-header">
+    <h1>Create Event</h1>
+    <a href="/events" class="btn btn-secondary">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Back to Events
+    </a>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<div class="form-card">
+    <form action="/events/create" method="POST">
+        <div class="form-group">
+            <label for="title">Event Title *</label>
+            <input type="text" id="title" name="title" class="form-control" required
+                   value="<%= typeof form !== 'undefined' ? form.title || '' : '' %>">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control" rows="4"><%= typeof form !== 'undefined' ? form.description || '' : '' %></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Event Schedule *</label>
+            <div id="shift-calendar-container"></div>
+            <p class="form-hint">Click and drag on the calendar to add shifts. You can add multiple shifts across different days.</p>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="location">Location Name</label>
+                <input type="text" id="location" name="location" class="form-control"
+                       placeholder="e.g., City Park, Community Center"
+                       value="<%= typeof form !== 'undefined' ? form.location || '' : '' %>">
+            </div>
+            <div class="form-group">
+                <label for="capacity">Volunteer Capacity</label>
+                <input type="number" id="capacity" name="capacity" class="form-control" min="1"
+                       placeholder="Leave empty for unlimited"
+                       value="<%= typeof form !== 'undefined' ? form.capacity || '' : '' %>">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="signupDeadline">Signup Deadline</label>
+            <input type="datetime-local" id="signupDeadline" name="signupDeadline" class="form-control"
+                   value="<%= typeof form !== 'undefined' ? form.signupDeadline || '' : '' %>">
+            <span class="form-hint">Leave empty to default to 5 days before the event</span>
+        </div>
+
+        <div class="form-group">
+            <label for="address">Full Address</label>
+            <textarea id="address" name="address" class="form-control" rows="2"><%= typeof form !== 'undefined' ? form.address || '' : '' %></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="requirements">Requirements / What to Bring</label>
+            <textarea id="requirements" name="requirements" class="form-control" rows="3"
+                      placeholder="e.g., Comfortable shoes, water bottle, sunscreen..."><%= typeof form !== 'undefined' ? form.requirements || '' : '' %></textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="contactEmail">Contact Email</label>
+                <input type="email" id="contactEmail" name="contactEmail" class="form-control"
+                       value="<%= typeof form !== 'undefined' ? form.contactEmail || '' : '' %>">
+            </div>
+            <div class="form-group">
+                <label for="contactPhone">Contact Phone</label>
+                <input type="tel" id="contactPhone" name="contactPhone" class="form-control"
+                       value="<%= typeof form !== 'undefined' ? form.contactPhone || '' : '' %>">
+            </div>
+        </div>
+
+        <div class="form-hint" style="margin-bottom: var(--spacing-md);">
+            * Required fields. The event will be saved as a draft. You can publish it when ready.
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <span class="material-symbols-outlined">save</span>
+            Create Event
+        </button>
+    </form>
+</div>
+
+<script src="/static/javascript/components/shift-calendar.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendar = new ShiftCalendar('#shift-calendar-container');
+
+        // Validation before submit
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const shifts = calendar.getShifts();
+            if (shifts.length === 0) {
+                e.preventDefault();
+                alert('Please add at least one shift to the event schedule');
+            }
+        });
+    });
+</script>

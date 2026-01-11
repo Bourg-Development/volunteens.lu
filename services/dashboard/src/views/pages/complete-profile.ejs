@@ -1,0 +1,223 @@
+<p class="form-intro">Please complete your profile to continue. This information is required for processing volunteer payments.</p>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <ul class="error-list">
+            <% errors.forEach(err => { %>
+                <li><%= err %></li>
+            <% }); %>
+        </ul>
+    </div>
+<% } %>
+
+<form action="/complete-profile" method="POST" class="profile-form">
+    <h3 class="form-section-title">Personal Information</h3>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="firstName">First Name <span class="required">*</span></label>
+            <input type="text" id="firstName" name="firstName" required
+                   value="<%= typeof profile !== 'undefined' && profile.firstName ? profile.firstName : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name <span class="required">*</span></label>
+            <input type="text" id="lastName" name="lastName" required
+                   value="<%= typeof profile !== 'undefined' && profile.lastName ? profile.lastName : '' %>">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="dateOfBirth">Date of Birth <span class="required">*</span></label>
+            <input type="date" id="dateOfBirth" name="dateOfBirth" required
+                   value="<%= typeof profile !== 'undefined' && profile.dateOfBirth ? profile.dateOfBirth : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number <span class="required">*</span></label>
+            <input type="tel" id="phone" name="phone" required placeholder="+352 000 000 000"
+                   value="<%= typeof profile !== 'undefined' && profile.phone ? profile.phone : '' %>">
+        </div>
+    </div>
+
+    <h3 class="form-section-title">Address</h3>
+
+    <div class="form-group">
+        <label for="street">Street Address <span class="required">*</span></label>
+        <input type="text" id="street" name="street" required placeholder="123 Main Street"
+               value="<%= typeof profile !== 'undefined' && profile.street ? profile.street : '' %>">
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="city">City <span class="required">*</span></label>
+            <input type="text" id="city" name="city" required
+                   value="<%= typeof profile !== 'undefined' && profile.city ? profile.city : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="postalCode">Postal Code <span class="required">*</span></label>
+            <input type="text" id="postalCode" name="postalCode" required placeholder="L-1234"
+                   value="<%= typeof profile !== 'undefined' && profile.postalCode ? profile.postalCode : '' %>">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="country">Country</label>
+        <input type="text" id="country" name="country"
+               value="<%= typeof profile !== 'undefined' && profile.country ? profile.country : 'Luxembourg' %>">
+    </div>
+
+    <h3 class="form-section-title">Bank Details</h3>
+    <p class="form-hint">Required for receiving volunteer compensation payments.</p>
+
+    <div class="form-group">
+        <label for="iban">IBAN <span class="required">*</span></label>
+        <input type="text" id="iban" name="iban" required placeholder="LU00 0000 0000 0000 0000"
+               value="<%= typeof profile !== 'undefined' && profile.iban ? profile.iban : '' %>">
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="bic">BIC/SWIFT</label>
+            <input type="text" id="bic" name="bic" placeholder="XXXXXXXX"
+                   value="<%= typeof profile !== 'undefined' && profile.bic ? profile.bic : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="bankName">Bank Name</label>
+            <input type="text" id="bankName" name="bankName"
+                   value="<%= typeof profile !== 'undefined' && profile.bankName ? profile.bankName : '' %>">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="accountHolderName">Account Holder Name</label>
+        <input type="text" id="accountHolderName" name="accountHolderName"
+               placeholder="Leave empty to use your name"
+               value="<%= typeof profile !== 'undefined' && profile.accountHolderName ? profile.accountHolderName : '' %>">
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <span class="material-symbols-outlined">check</span>
+            Complete Profile
+        </button>
+    </div>
+</form>
+
+<style>
+.form-intro {
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.5;
+}
+
+.form-section-title {
+    font-size: 1rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-dark);
+    margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid rgba(14, 47, 82, 0.1);
+}
+
+.form-section-title:first-of-type {
+    margin-top: 0;
+}
+
+.form-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin: calc(-1 * var(--spacing-sm)) 0 var(--spacing-md) 0;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 500px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-dark);
+    margin-bottom: var(--spacing-xs);
+}
+
+.form-group input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid rgba(14, 47, 82, 0.2);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(77, 171, 154, 0.15);
+}
+
+.required {
+    color: #e74c3c;
+}
+
+.form-actions {
+    margin-top: var(--spacing-xl);
+}
+
+.form-actions .btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.alert-error {
+    background: rgba(231, 76, 60, 0.1);
+    color: #c0392b;
+}
+
+.alert .material-symbols-outlined {
+    flex-shrink: 0;
+}
+
+.error-list {
+    margin: 0;
+    padding-left: var(--spacing-md);
+}
+
+.error-list li {
+    margin: var(--spacing-xs) 0;
+}
+
+.btn-lg {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: 1rem;
+}
+</style>

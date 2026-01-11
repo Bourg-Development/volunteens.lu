@@ -1,0 +1,83 @@
+<h1>User Management</h1>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<div class="mb-1">
+    <a href="/users/create" class="btn btn-primary">Create User</a>
+</div>
+
+<div class="card">
+    <% if (users.length === 0) { %>
+        <p>No users found.</p>
+    <% } else { %>
+    <table>
+        <thead>
+            <tr>
+                <th>Name / Org</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(u => { %>
+            <tr>
+                <td>
+                    <% if (u.role === 'organization') { %>
+                        <%= u.organizationName || 'N/A' %>
+                    <% } else { %>
+                        <%= u.firstName || '' %> <%= u.lastName || '' %>
+                    <% } %>
+                </td>
+                <td><%= u.email %></td>
+                <td>
+                    <% if (u.accountStatus === 'active') { %>
+                        <span class="badge badge-active">Active</span>
+                    <% } else if (u.accountStatus === 'pending_approval') { %>
+                        <span class="badge badge-pending">Pending</span>
+                    <% } else { %>
+                        <span class="badge badge-locked"><%= u.accountStatus %></span>
+                    <% } %>
+                </td>
+                <td>
+                    <% if (u.id === user.id) { %>
+                        <strong><%= u.role %></strong> (you)
+                    <% } else { %>
+                        <form method="POST" action="/users/<%= u.id %>/role" style="display:inline">
+                            <select name="role" onchange="this.form.submit()" <%= u.role === 'super_admin' && user.role !== 'super_admin' ? 'disabled' : '' %>>
+                                <option value="student" <%= u.role === 'student' ? 'selected' : '' %>>student</option>
+                                <option value="organization" <%= u.role === 'organization' ? 'selected' : '' %>>organization</option>
+                                <option value="moderator" <%= u.role === 'moderator' ? 'selected' : '' %>>moderator</option>
+                                <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>admin</option>
+                                <% if (user.role === 'super_admin') { %>
+                                <option value="super_admin" <%= u.role === 'super_admin' ? 'selected' : '' %>>super_admin</option>
+                                <% } %>
+                            </select>
+                        </form>
+                    <% } %>
+                </td>
+                <td class="actions">
+                    <a href="/users/<%= u.id %>" class="btn btn-primary">View</a>
+                    <% if (u.id !== user.id) { %>
+                        <% if (u.accountStatus === 'active') { %>
+                            <form method="POST" action="/users/<%= u.id %>/status" style="display:inline" onsubmit="return confirm('Deactivate this user?')">
+                                <input type="hidden" name="status" value="locked">
+                                <button type="submit" class="btn btn-danger">Deactivate</button>
+                            </form>
+                        <% } else if (u.accountStatus === 'locked') { %>
+                            <form method="POST" action="/users/<%= u.id %>/status" style="display:inline">
+                                <input type="hidden" name="status" value="active">
+                                <button type="submit" class="btn btn-success">Activate</button>
+                            </form>
+                        <% } %>
+                    <% } %>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <% } %>
+</div>

@@ -1,0 +1,38 @@
+<% title = typeof title !== 'undefined' ? title : "Error" %>
+<link rel="stylesheet" href="/static/stylesheets/pages/error.css">
+
+<section class="error-page">
+    <div class="error-content fade-in">
+        <div class="error-visual">
+            <div class="error-number">
+                <% const digits = String(error || '500').split(''); %>
+                <% digits.forEach((digit, index) => { %>
+                    <span class="digit" style="animation-delay: <%= index * 0.1 %>s"><%= digit %></span>
+                <% }); %>
+            </div>
+        </div>
+
+        <h1><%= typeof heading !== 'undefined' ? heading : 'Something went wrong' %></h1>
+        <p class="error-message">
+            <%= typeof msg !== 'undefined' ? msg : 'An unexpected error occurred. Please try again later.' %>
+        </p>
+
+        <div class="error-actions">
+            <% if (typeof showRetry !== 'undefined' && showRetry) { %>
+                <a href="javascript:location.reload()" class="btn btn-secondary">
+                    <span class="material-symbols-outlined">refresh</span>
+                    Try Again
+                </a>
+            <% } %>
+            <a href="/" class="btn btn-primary">
+                <span class="material-symbols-outlined">home</span>
+                Go Home
+            </a>
+        </div>
+    </div>
+
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+</section>

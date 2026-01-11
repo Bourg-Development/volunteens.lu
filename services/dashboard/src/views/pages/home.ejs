@@ -1,0 +1,25 @@
+<div class="card">
+    <h1>Welcome, <%= user.email %>!</h1>
+    <p style="color: var(--color-text-muted);">
+        Your account type: <span class="badge badge-pending"><%= user.role %></span>
+    </p>
+    <p>This dashboard is designed for students and organizations.</p>
+
+    <div class="card-actions" style="margin-top: var(--spacing-lg);">
+        <% if (user.role === 'organization') { %>
+            <a href="/events" class="btn btn-primary">
+                <span class="material-symbols-outlined">event</span>
+                My Events
+            </a>
+            <a href="/events/create" class="btn btn-secondary">
+                <span class="material-symbols-outlined">add_circle</span>
+                Create Event
+            </a>
+        <% } else if (user.role === 'student') { %>
+            <a href="/events" class="btn btn-primary">
+                <span class="material-symbols-outlined">event</span>
+                Browse Events
+            </a>
+        <% } %>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Admin' %> | Volunteens Admin</title>
+    <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Volunteens Admin</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/pending">Pending Approvals</a>
+            <a href="/users">Users</a>
+            <a href="/events">Events</a>
+            <a href="/settings">Settings</a>
+        </div>
+        <div class="nav-user">
+            <% if (typeof user !== 'undefined' && user) { %>
+                <%= user.email %> | <a href="<%= authUrl %>/api/v1/auth/logout">Logout</a>
+            <% } %>
+        </div>
+    </nav>
+    <main class="container">
+        <%- body %>
+    </main>
+</body>
+</html>

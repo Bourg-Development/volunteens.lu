@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Request Received</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #0e2f52; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }
+        .email-container { background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(9, 135, 201, 0.1); }
+        .header { background: linear-gradient(135deg, #0987c9, #7ed956); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+        .header p { margin: 10px 0 0 0; opacity: 0.9; font-size: 16px; }
+        .content { padding: 40px 30px; }
+        .content p { color: #5a6c7d; margin: 0 0 20px 0; }
+        .content p strong { color: #0e2f52; }
+        .status-card { background: #fef3c7; border-radius: 12px; padding: 25px; margin: 25px 0; border-left: 4px solid #f59e0b; text-align: center; }
+        .status-badge { display: inline-block; background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; padding: 10px 25px; border-radius: 50px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .status-text { margin-top: 15px; color: #92400e; font-size: 14px; }
+        .timeline { margin: 30px 0; }
+        .timeline-item { display: flex; align-items: flex-start; margin-bottom: 20px; }
+        .timeline-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #0987c9, #7ed956); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0; color: white; font-weight: 600; font-size: 14px; }
+        .timeline-icon.pending { background: #e5e7eb; color: #5a6c7d; }
+        .timeline-icon.active { background: linear-gradient(135deg, #0987c9, #7ed956); }
+        .timeline-content h3 { margin: 0 0 5px 0; color: #0e2f52; font-size: 15px; }
+        .timeline-content p { margin: 0; font-size: 13px; color: #5a6c7d; }
+        .info-box { background: #e0f2fe; border-radius: 8px; padding: 15px; margin-top: 25px; }
+        .info-box p { margin: 0; color: #0369a1; font-size: 14px; }
+        .footer { text-align: center; padding: 25px 30px; background: #f8f9fa; border-top: 1px solid #e5e7eb; }
+        .footer p { margin: 0; color: #5a6c7d; font-size: 14px; }
+        .footer .brand { color: #0987c9; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Request Received!</h1>
+            <p>Thank you for registering</p>
+        </div>
+        <div class="content">
+            <p>Dear <strong><%= organizationName %></strong>,</p>
+            <p>Thank you for your interest in joining Volunteens! We've received your organization registration request.</p>
+
+            <div class="status-card">
+                <span class="status-badge">Pending Approval</span>
+                <p class="status-text">Your account is currently being reviewed by our team.</p>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-icon active">1</div>
+                    <div class="timeline-content">
+                        <h3>Registration Submitted</h3>
+                        <p>We've received your organization details</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon pending">2</div>
+                    <div class="timeline-content">
+                        <h3>Under Review</h3>
+                        <p>A sales representative will review your application</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon pending">3</div>
+                    <div class="timeline-content">
+                        <h3>Account Activated</h3>
+                        <p>Once approved, you'll receive access to your dashboard</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <p>A member of our sales team will be in touch shortly to discuss your organization's needs. The approval process typically takes 1-2 business days.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p><span class="brand">Volunteens</span> - Connecting young volunteers with opportunities</p>
+        </div>
+    </div>
+</body>
+</html>

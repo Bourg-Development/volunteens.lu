@@ -1,0 +1,658 @@
+<div class="page-header">
+    <div>
+        <h1><%= event.title %></h1>
+        <span class="badge badge-<%= event.status %>"><%= event.status %></span>
+    </div>
+    <div class="page-header-actions">
+        <button type="button" class="btn btn-secondary" id="edit-event-btn">
+            <span class="material-symbols-outlined">edit</span>
+            Edit Event
+        </button>
+        <% if (event.status === 'draft') { %>
+            <form action="/events/<%= event.id %>/publish" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-success">
+                    <span class="material-symbols-outlined">publish</span>
+                    Publish
+                </button>
+            </form>
+        <% } %>
+    </div>
+</div>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <%= typeof msg !== 'undefined' ? msg : 'Operation successful' %>
+    </div>
+<% } %>
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<div class="overview-grid">
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">group</span>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value"><%= stats.totalSignups %></div>
+                <div class="stat-label">Total Signups</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon confirmed">
+                <span class="material-symbols-outlined">check_circle</span>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value"><%= stats.confirmedSignups %></div>
+                <div class="stat-label">Confirmed</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <span class="material-symbols-outlined">pending</span>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value"><%= stats.pendingSignups %></div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon shifts">
+                <span class="material-symbols-outlined">schedule</span>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value"><%= stats.totalShifts %></div>
+                <div class="stat-label">Shifts</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Details -->
+    <div class="overview-section">
+        <h3>Event Details</h3>
+        <div class="details-grid">
+            <% if (event.location) { %>
+                <div class="detail-item">
+                    <span class="material-symbols-outlined">location_on</span>
+                    <div>
+                        <div class="detail-label">Location</div>
+                        <div class="detail-value"><%= event.location %></div>
+                    </div>
+                </div>
+            <% } %>
+            <% if (event.address) { %>
+                <div class="detail-item">
+                    <span class="material-symbols-outlined">home</span>
+                    <div>
+                        <div class="detail-label">Address</div>
+                        <div class="detail-value"><%= event.address %></div>
+                    </div>
+                </div>
+            <% } %>
+            <% if (event.capacity) { %>
+                <div class="detail-item">
+                    <span class="material-symbols-outlined">people</span>
+                    <div>
+                        <div class="detail-label">Capacity</div>
+                        <div class="detail-value"><%= event.signupCount || 0 %> / <%= event.capacity %></div>
+                    </div>
+                </div>
+            <% } %>
+            <% if (event.signupDeadline) { %>
+                <div class="detail-item">
+                    <span class="material-symbols-outlined">alarm</span>
+                    <div>
+                        <div class="detail-label">Signup Deadline</div>
+                        <div class="detail-value"><%= new Date(event.signupDeadline).toLocaleString('en-GB') %></div>
+                    </div>
+                </div>
+            <% } %>
+            <% if (event.contactEmail) { %>
+                <div class="detail-item">
+                    <span class="material-symbols-outlined">mail</span>
+                    <div>
+                        <div class="detail-label">Contact Email</div>
+                        <div class="detail-value"><%= event.contactEmail %></div>
+                    </div>
+                </div>
+            <% } %>
+            <% if (event.contactPhone) { %>
+                <div class="detail-item">
+                    <span class="material-symbols-outlined">phone</span>
+                    <div>
+                        <div class="detail-label">Contact Phone</div>
+                        <div class="detail-value"><%= event.contactPhone %></div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Schedule -->
+    <% if (shifts && shifts.length > 0) { %>
+        <div class="overview-section">
+            <h3>Schedule</h3>
+            <div class="shifts-timeline">
+                <%
+                    const sortedShifts = [...shifts].sort((a, b) => {
+                        if (a.date !== b.date) return a.date.localeCompare(b.date);
+                        return a.startTime.localeCompare(b.startTime);
+                    });
+                %>
+                <% sortedShifts.forEach((shift, index) => { %>
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            <%= new Date(shift.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) %>
+                        </div>
+                        <div class="timeline-time">
+                            <%= shift.startTime.substring(0, 5) %> - <%= shift.endTime.substring(0, 5) %>
+                        </div>
+                        <div class="timeline-meta">
+                            <span class="material-symbols-outlined">person</span>
+                            <%= (shift.assignments || []).length %> assigned
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Description -->
+    <% if (event.description) { %>
+        <div class="overview-section">
+            <h3>Description</h3>
+            <p class="description-text"><%= event.description %></p>
+        </div>
+    <% } %>
+
+    <!-- Requirements -->
+    <% if (event.requirements) { %>
+        <div class="overview-section">
+            <h3>Requirements</h3>
+            <p class="description-text"><%= event.requirements %></p>
+        </div>
+    <% } %>
+</div>
+
+<!-- Actions -->
+<div class="overview-actions">
+    <% if (event.status === 'published') { %>
+        <form action="/events/<%= event.id %>/cancel" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to cancel this event?')">
+                <span class="material-symbols-outlined">cancel</span>
+                Cancel Event
+            </button>
+        </form>
+    <% } %>
+    <% if (event.status === 'draft' || event.status === 'cancelled') { %>
+        <form action="/events/<%= event.id %>/delete" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this event? This cannot be undone.')">
+                <span class="material-symbols-outlined">delete</span>
+                Delete Event
+            </button>
+        </form>
+    <% } %>
+</div>
+
+<style>
+.page-header-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.overview-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    background: rgba(9, 135, 201, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon .material-symbols-outlined {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+}
+
+.stat-icon.confirmed {
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.stat-icon.confirmed .material-symbols-outlined {
+    color: #27ae60;
+}
+
+.stat-icon.pending {
+    background: rgba(243, 156, 18, 0.1);
+}
+
+.stat-icon.pending .material-symbols-outlined {
+    color: #f39c12;
+}
+
+.stat-icon.shifts {
+    background: rgba(155, 89, 182, 0.1);
+}
+
+.stat-icon.shifts .material-symbols-outlined {
+    color: #9b59b6;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-dark);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.overview-section {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.overview-section h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-dark);
+    font-size: 1.1rem;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+}
+
+.detail-item .material-symbols-outlined {
+    color: var(--color-primary);
+    font-size: 1.25rem;
+    margin-top: 2px;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.detail-value {
+    color: var(--color-dark);
+    font-weight: var(--font-weight-medium);
+}
+
+.shifts-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-background-alt);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-primary);
+}
+
+.timeline-date {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-dark);
+    min-width: 100px;
+}
+
+.timeline-time {
+    color: var(--color-text-muted);
+    min-width: 110px;
+}
+
+.timeline-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.timeline-meta .material-symbols-outlined {
+    font-size: 1rem;
+}
+
+.description-text {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.overview-actions {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid rgba(14, 47, 82, 0.1);
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .timeline-item {
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+    }
+
+    .timeline-date,
+    .timeline-time {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .page-header-actions .btn,
+    .page-header-actions form {
+        width: 100%;
+    }
+
+    .page-header-actions form .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Edit Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid rgba(14, 47, 82, 0.1);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+    background: var(--color-background-alt);
+    color: var(--color-dark);
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid rgba(14, 47, 82, 0.1);
+    background: var(--color-background-alt);
+}
+
+.modal .form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.modal .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.modal .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 600px) {
+    .modal .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<!-- Edit Event Modal -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Edit Event</h2>
+            <button type="button" class="modal-close" id="close-modal">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form id="edit-event-form">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit-title">Event Title *</label>
+                    <input type="text" id="edit-title" name="title" class="form-control" required
+                           value="<%= event.title %>">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-description">Description</label>
+                    <textarea id="edit-description" name="description" class="form-control" rows="3"><%= event.description || '' %></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-location">Location Name</label>
+                        <input type="text" id="edit-location" name="location" class="form-control"
+                               value="<%= event.location || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-capacity">Volunteer Capacity</label>
+                        <input type="number" id="edit-capacity" name="capacity" class="form-control" min="1"
+                               value="<%= event.capacity || '' %>">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-address">Full Address</label>
+                    <textarea id="edit-address" name="address" class="form-control" rows="2"><%= event.address || '' %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-signupDeadline">Signup Deadline</label>
+                    <input type="datetime-local" id="edit-signupDeadline" name="signupDeadline" class="form-control"
+                           value="<%= event.signupDeadline ? new Date(event.signupDeadline).toISOString().slice(0, 16) : '' %>">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-requirements">Requirements / What to Bring</label>
+                    <textarea id="edit-requirements" name="requirements" class="form-control" rows="2"><%= event.requirements || '' %></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-contactEmail">Contact Email</label>
+                        <input type="email" id="edit-contactEmail" name="contactEmail" class="form-control"
+                               value="<%= event.contactEmail || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-contactPhone">Contact Phone</label>
+                        <input type="tel" id="edit-contactPhone" name="contactPhone" class="form-control"
+                               value="<%= event.contactPhone || '' %>">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancel-edit">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                    <span class="material-symbols-outlined">save</span>
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const eventId = '<%= event.id %>';
+    const modal = document.getElementById('edit-modal');
+    const editBtn = document.getElementById('edit-event-btn');
+    const closeBtn = document.getElementById('close-modal');
+    const cancelBtn = document.getElementById('cancel-edit');
+    const form = document.getElementById('edit-event-form');
+
+    function openModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    editBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        // Keep existing shifts
+        data.shifts = <%- JSON.stringify((event.shifts || []).map(s => ({
+            date: s.date,
+            startTime: s.startTime,
+            endTime: s.endTime
+        }))) %>;
+
+        try {
+            const response = await fetch(`/events/${eventId}/edit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.reload();
+            } else {
+                alert(result.error || 'Failed to save changes');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Failed to save changes');
+        }
+    });
+});
+</script>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Dashboard' %> | Volunteens</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="/static/stylesheets/common/variables.css">
+    <link rel="stylesheet" href="/static/stylesheets/common/reset.css">
+    <link rel="stylesheet" href="/static/stylesheets/common/buttons.css">
+    <style>
+        body {
+            background: var(--color-background);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+        }
+
+        .minimal-container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .minimal-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .minimal-logo {
+            height: 60px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .minimal-title {
+            font-size: 1.5rem;
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-dark);
+            margin: 0;
+        }
+
+        .minimal-subtitle {
+            color: var(--color-text-muted);
+            margin-top: var(--spacing-xs);
+        }
+
+        .minimal-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-xl);
+        }
+    </style>
+</head>
+<body>
+    <div class="minimal-container">
+        <div class="minimal-header">
+            <img src="/static/media/branding/logo_icon_only.png" alt="Volunteens" class="minimal-logo">
+            <h1 class="minimal-title"><%= typeof title !== 'undefined' ? title : 'Volunteens' %></h1>
+            <% if (typeof subtitle !== 'undefined' && subtitle) { %>
+                <p class="minimal-subtitle"><%= subtitle %></p>
+            <% } %>
+        </div>
+        <div class="minimal-card">
+            <%- body %>
+        </div>
+    </div>
+</body>
+</html>

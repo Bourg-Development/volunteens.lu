@@ -1,0 +1,42 @@
+<h1>Pending Approvals</h1>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<div class="card">
+    <% if (users.length === 0) { %>
+        <p>No organizations pending approval.</p>
+    <% } else { %>
+    <table>
+        <thead>
+            <tr>
+                <th>Organization</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(org => { %>
+            <tr>
+                <td><%= org.organizationName || 'N/A' %></td>
+                <td><%= org.email %></td>
+                <td><%= org.organizationType || 'N/A' %></td>
+                <td><%= new Date(org.createdAt).toLocaleDateString() %></td>
+                <td class="actions">
+                    <a href="/users/<%= org.id %>" class="btn btn-primary">View</a>
+                    <form method="POST" action="/users/<%= org.id %>/approve" style="display:inline">
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </form>
+                    <form method="POST" action="/users/<%= org.id %>/reject" style="display:inline">
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <% } %>
+</div>

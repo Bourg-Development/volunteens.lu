@@ -1,0 +1,42 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+            <span class="material-icons">volunteer_activism</span>
+            Volunteens
+        </a>
+    </div>
+
+    <ul class="sidebar-nav">
+        <% if (user.role === 'organization') { %>
+            <li>
+                <a href="/events" class="<%= activeNav === 'events' ? 'active' : '' %>">
+                    <span class="material-icons">event</span>
+                    My Events
+                </a>
+            </li>
+            <li>
+                <a href="/events/create" class="<%= activeNav === 'create' ? 'active' : '' %>">
+                    <span class="material-icons">add_circle</span>
+                    Create Event
+                </a>
+            </li>
+        <% } else if (user.role === 'student') { %>
+            <li>
+                <a href="/events" class="<%= activeNav === 'events' ? 'active' : '' %>">
+                    <span class="material-icons">event</span>
+                    Events
+                </a>
+            </li>
+        <% } %>
+    </ul>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <span class="material-icons">account_circle</span>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-email"><%= user.email %></div>
+                <div class="sidebar-user-role"><%= user.role %></div>
+            </div>
+        </div>
+    </div>
+</aside>

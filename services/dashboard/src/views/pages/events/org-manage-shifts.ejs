@@ -1,0 +1,744 @@
+<div class="page-header">
+    <div>
+        <h1>Shifts</h1>
+        <p class="page-subtitle"><%= event.title %></p>
+    </div>
+    <button type="button" class="btn btn-secondary" id="edit-shifts-btn">
+        <span class="material-symbols-outlined">edit_calendar</span>
+        Edit Shifts
+    </button>
+</div>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <%= typeof msg !== 'undefined' ? msg : 'Action completed successfully' %>
+    </div>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (shifts.length === 0) { %>
+    <div class="empty-state">
+        <span class="material-symbols-outlined">event_busy</span>
+        <p>No shifts defined for this event</p>
+        <button type="button" class="btn btn-primary" id="add-shifts-btn">
+            <span class="material-symbols-outlined">add</span>
+            Add Shifts
+        </button>
+    </div>
+<% } else { %>
+
+<div class="shifts-manager">
+    <!-- Unassigned Students Pool -->
+    <div class="students-pool">
+        <h3>
+            <span class="material-symbols-outlined">group</span>
+            Confirmed Students
+        </h3>
+        <p class="pool-hint">Drag students to assign them to shifts</p>
+        <div class="students-list" id="unassigned-pool">
+            <% if (confirmedSignups.length === 0) { %>
+                <div class="empty-pool">No confirmed students yet</div>
+            <% } else { %>
+                <% confirmedSignups.forEach(signup => { %>
+                    <div class="student-card draggable" draggable="true"
+                         data-signup-id="<%= signup.id %>"
+                         data-student-name="<%= signup.studentName || signup.studentEmail %>">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="student-name"><%= signup.studentName || signup.studentEmail %></span>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Shifts Grid -->
+    <div class="shifts-grid">
+        <% shifts.forEach((shift, index) => {
+            const shiftDate = new Date(shift.date);
+            const dateStr = shiftDate.toLocaleDateString('en-GB', {
+                weekday: 'short', day: 'numeric', month: 'short'
+            });
+            const startH = shift.startTime.substring(0, 5);
+            const endH = shift.endTime.substring(0, 5);
+
+            // Calculate hours
+            const [sH, sM] = shift.startTime.split(':').map(Number);
+            const [eH, eM] = shift.endTime.split(':').map(Number);
+            const hours = ((eH * 60 + eM) - (sH * 60 + sM)) / 60;
+
+            const assignments = shift.assignments || [];
+            const assigned = assignments.filter(a => a.status === 'assigned');
+            const attended = assignments.filter(a => a.status === 'attended');
+            const noShow = assignments.filter(a => a.status === 'no_show');
+        %>
+            <div class="shift-card" data-shift-id="<%= shift.id %>">
+                <div class="shift-header">
+                    <div class="shift-info">
+                        <h4>Shift <%= index + 1 %></h4>
+                        <span class="shift-date"><%= dateStr %></span>
+                        <span class="shift-time"><%= startH %> - <%= endH %> (<%= hours.toFixed(1) %>h)</span>
+                    </div>
+                </div>
+
+                <div class="shift-drop-zone"
+                     data-shift-id="<%= shift.id %>"
+                     data-status="assigned">
+                    <% const allAssignments = [...assigned, ...attended, ...noShow]; %>
+                    <% if (allAssignments.length === 0) { %>
+                        <div class="drop-placeholder">
+                            <span class="material-symbols-outlined">person_add</span>
+                            Drop students here to assign
+                        </div>
+                    <% } else { %>
+                        <div class="assigned-students">
+                            <% allAssignments.forEach(a => { %>
+                                <div class="student-card"
+                                     data-assignment-id="<%= a.id %>"
+                                     data-signup-id="<%= a.signupId %>">
+                                    <span class="material-symbols-outlined">person</span>
+                                    <span class="student-name"><%= a.signup?.studentName || a.signup?.studentEmail || 'Student' %></span>
+                                    <% if (a.status === 'attended') { %>
+                                        <span class="status-badge attended" title="Attended">
+                                            <span class="material-symbols-outlined">check</span>
+                                        </span>
+                                    <% } else if (a.status === 'no_show') { %>
+                                        <span class="status-badge no-show" title="No Show">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </span>
+                                    <% } %>
+                                    <button type="button" class="remove-btn" data-assignment-id="<%= a.id %>" title="Remove">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<% } %>
+
+<style>
+.page-subtitle {
+    color: var(--color-text-muted);
+    margin: var(--spacing-xs) 0 0 0;
+    font-size: 0.95rem;
+}
+
+.shifts-manager {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: var(--spacing-lg);
+    align-items: start;
+}
+
+/* Students Pool */
+.students-pool {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: var(--spacing-md);
+}
+
+.students-pool h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: 1rem;
+}
+
+.pool-hint {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    margin: 0 0 var(--spacing-md) 0;
+}
+
+.students-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    min-height: 100px;
+}
+
+.empty-pool {
+    color: var(--color-text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: var(--spacing-md);
+}
+
+/* Student Card */
+.student-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-background-alt);
+    border-radius: var(--radius-sm);
+    cursor: grab;
+    transition: all var(--transition-fast);
+    font-size: 0.85rem;
+}
+
+.student-card:hover {
+    background: rgba(9, 135, 201, 0.1);
+}
+
+.student-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.student-card .material-symbols-outlined {
+    font-size: 1rem;
+    color: var(--color-primary);
+}
+
+.student-card .student-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.student-card .remove-btn {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.student-card:hover .remove-btn {
+    opacity: 1;
+}
+
+.student-card .remove-btn:hover {
+    color: var(--color-error);
+}
+
+.student-card .remove-btn .material-symbols-outlined {
+    font-size: 0.9rem;
+    color: inherit;
+}
+
+.student-card.attended {
+    background: rgba(39, 174, 96, 0.15);
+    border-left: 3px solid var(--color-success);
+}
+
+.student-card.no-show {
+    background: rgba(231, 76, 60, 0.15);
+    border-left: 3px solid var(--color-error);
+}
+
+/* Shifts Grid */
+.shifts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.shift-card {
+    background: white;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.shift-header {
+    padding: var(--spacing-md);
+    background: var(--color-background-alt);
+    border-bottom: 1px solid rgba(14, 47, 82, 0.1);
+}
+
+.shift-info h4 {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 1rem;
+}
+
+.shift-date {
+    font-weight: var(--font-weight-semibold);
+    margin-right: var(--spacing-sm);
+}
+
+.shift-time {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+/* Shift Drop Zone */
+.shift-drop-zone {
+    padding: var(--spacing-md);
+    min-height: 80px;
+    transition: background var(--transition-fast);
+}
+
+.shift-drop-zone.drag-over {
+    background: rgba(9, 135, 201, 0.08);
+}
+
+.drop-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-lg);
+    color: var(--color-text-muted);
+    border: 2px dashed rgba(14, 47, 82, 0.15);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+}
+
+.drop-placeholder .material-symbols-outlined {
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+
+.assigned-students {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-left: auto;
+}
+
+.status-badge .material-symbols-outlined {
+    font-size: 0.8rem;
+}
+
+.status-badge.attended {
+    background: rgba(39, 174, 96, 0.2);
+    color: #27ae60;
+}
+
+.status-badge.no-show {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--color-text-muted);
+}
+
+.empty-state .material-symbols-outlined {
+    font-size: 48px;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .shifts-manager {
+        grid-template-columns: 1fr;
+    }
+
+    .students-pool {
+        position: static;
+    }
+
+    .shift-zones {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const eventId = '<%= event.id %>';
+    let draggedElement = null;
+    let draggedData = null;
+
+    // Make only pool student cards draggable
+    document.querySelectorAll('#unassigned-pool .draggable').forEach(el => {
+        el.addEventListener('dragstart', handleDragStart);
+        el.addEventListener('dragend', handleDragEnd);
+    });
+
+    // Set up drop zones
+    document.querySelectorAll('.shift-drop-zone').forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('dragleave', handleDragLeave);
+        zone.addEventListener('drop', handleDrop);
+    });
+
+    // Set up unassigned pool as drop zone (for removing from shifts)
+    const pool = document.getElementById('unassigned-pool');
+    pool.addEventListener('dragover', handleDragOver);
+    pool.addEventListener('dragleave', handleDragLeave);
+    pool.addEventListener('drop', handleDropToPool);
+
+    // Remove buttons
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', handleRemove);
+    });
+
+    function handleDragStart(e) {
+        draggedElement = this;
+        draggedData = {
+            signupId: this.dataset.signupId,
+            assignmentId: this.dataset.assignmentId,
+            studentName: this.dataset.studentName
+        };
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', JSON.stringify(draggedData));
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        draggedElement = null;
+        draggedData = null;
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('drag-over');
+    }
+
+    async function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+
+        if (!draggedData) return;
+
+        const shiftId = this.dataset.shiftId;
+
+        // Only handle new assignments from pool (not moving existing ones)
+        if (!draggedData.assignmentId) {
+            try {
+                await assignToShift(shiftId, draggedData.signupId);
+                window.location.reload();
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Failed to assign student');
+            }
+        }
+    }
+
+    async function handleDropToPool(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+
+        if (!draggedData || !draggedData.assignmentId) return;
+
+        // Get the shift ID from the dragged element's parent
+        const zone = draggedElement.closest('.shift-drop-zone');
+        if (!zone) return;
+
+        const shiftId = zone.dataset.shiftId;
+
+        try {
+            await removeAssignment(shiftId, draggedData.assignmentId);
+            window.location.reload();
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Failed to remove assignment');
+        }
+    }
+
+    async function handleRemove(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const assignmentId = this.dataset.assignmentId;
+        const zone = this.closest('.shift-drop-zone');
+        if (!zone) return;
+
+        const shiftId = zone.dataset.shiftId;
+
+        if (!confirm('Remove this student from the shift?')) return;
+
+        try {
+            await removeAssignment(shiftId, assignmentId);
+            window.location.reload();
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Failed to remove assignment');
+        }
+    }
+
+    async function assignToShift(shiftId, signupId) {
+        const response = await fetch(`/events/${eventId}/shifts/${shiftId}/assign`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ signupIds: [signupId] })
+        });
+        if (!response.ok) {
+            const text = await response.text();
+            console.error('Assign failed:', text);
+            throw new Error('Failed to assign');
+        }
+        return response.json();
+    }
+
+    async function removeAssignment(shiftId, assignmentId) {
+        const response = await fetch(`/events/${eventId}/shifts/${shiftId}/assignments/${assignmentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const text = await response.text();
+            console.error('Remove failed:', text);
+            throw new Error('Failed to remove');
+        }
+        return response.json();
+    }
+});
+</script>
+
+<!-- Edit Shifts Modal -->
+<div class="modal-overlay" id="shifts-modal">
+    <div class="modal modal-large">
+        <div class="modal-header">
+            <h2>Edit Shifts</h2>
+            <button type="button" class="modal-close" id="close-shifts-modal">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="shift-calendar-container"></div>
+            <p class="form-hint" style="margin-top: var(--spacing-sm);">
+                Click and drag on the calendar to add shifts. Click on a shift to edit or delete it.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancel-shifts">Cancel</button>
+            <button type="button" class="btn btn-primary" id="save-shifts">
+                <span class="material-symbols-outlined">save</span>
+                Save Shifts
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal.modal-large {
+    max-width: 900px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid rgba(14, 47, 82, 0.1);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+    background: var(--color-background-alt);
+    color: var(--color-dark);
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid rgba(14, 47, 82, 0.1);
+    background: var(--color-background-alt);
+}
+</style>
+
+<link rel="stylesheet" href="/static/stylesheets/components/shift-calendar.css">
+<script src="/static/javascript/components/shift-calendar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const eventId = '<%= event.id %>';
+    const modal = document.getElementById('shifts-modal');
+    const editBtn = document.getElementById('edit-shifts-btn');
+    const addBtn = document.getElementById('add-shifts-btn');
+    const closeBtn = document.getElementById('close-shifts-modal');
+    const cancelBtn = document.getElementById('cancel-shifts');
+    const saveBtn = document.getElementById('save-shifts');
+
+    let calendar = null;
+
+    function openModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Initialize calendar if not already done
+        if (!calendar) {
+            calendar = new ShiftCalendar('#shift-calendar-container');
+        }
+
+        // Load existing shifts
+        const existingShifts = <%- JSON.stringify((shifts || []).map(s => ({
+            date: s.date,
+            startTime: s.startTime,
+            endTime: s.endTime
+        }))) %>;
+        calendar.setShifts(existingShifts);
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (editBtn) editBtn.addEventListener('click', openModal);
+    if (addBtn) addBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    saveBtn.addEventListener('click', async function() {
+        const newShifts = calendar.getShifts();
+
+        if (newShifts.length === 0) {
+            if (!confirm('Are you sure you want to remove all shifts? This will also remove all assignments.')) {
+                return;
+            }
+        }
+
+        // Get all existing event data
+        const existingEvent = <%- JSON.stringify({
+            title: event.title || '',
+            description: event.description || '',
+            location: event.location || '',
+            address: event.address || '',
+            capacity: event.capacity || '',
+            signupDeadline: event.signupDeadline || '',
+            requirements: event.requirements || '',
+            contactEmail: event.contactEmail || '',
+            contactPhone: event.contactPhone || ''
+        }) %>;
+
+        const eventData = {
+            ...existingEvent,
+            shifts: newShifts
+        };
+
+        try {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Saving...';
+
+            const response = await fetch(`/events/${eventId}/edit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(eventData)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.reload();
+            } else {
+                alert(result.error || 'Failed to save shifts');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<span class="material-symbols-outlined">save</span> Save Shifts';
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Failed to save shifts');
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<span class="material-symbols-outlined">save</span> Save Shifts';
+        }
+    });
+});
+</script>

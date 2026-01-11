@@ -1,0 +1,81 @@
+<h1>Create User</h1>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<div class="card">
+    <form method="POST" action="/users/create">
+        <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password *</label>
+            <input type="password" id="password" name="password" required minlength="8">
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role (Account Type)</label>
+            <select id="role" name="role" onchange="toggleFields()">
+                <option value="student">Student</option>
+                <option value="organization">Organization</option>
+                <option value="moderator">Moderator</option>
+                <option value="admin">Admin</option>
+                <% if (user.role === 'super_admin') { %>
+                <option value="super_admin">Super Admin</option>
+                <% } %>
+            </select>
+        </div>
+
+        <div id="studentFields">
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName">
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName">
+            </div>
+        </div>
+
+        <div id="orgFields" style="display:none;">
+            <div class="form-group">
+                <label for="organizationName">Organization Name</label>
+                <input type="text" id="organizationName" name="organizationName">
+            </div>
+
+            <div class="form-group">
+                <label for="organizationType">Organization Type</label>
+                <select id="organizationType" name="organizationType">
+                    <option value="">Select type</option>
+                    <option value="tech">Tech</option>
+                    <option value="marketing">Marketing</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create User</button>
+            <a href="/users" class="btn">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50; }
+.form-group input, .form-group select { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #3498db; }
+.form-actions { margin-top: 1.5rem; display: flex; gap: 1rem; }
+</style>
+
+<script>
+function toggleFields() {
+    var role = document.getElementById('role').value;
+    document.getElementById('studentFields').style.display = (role === 'student' || role === 'moderator' || role === 'admin' || role === 'super_admin') ? 'block' : 'none';
+    document.getElementById('orgFields').style.display = role === 'organization' ? 'block' : 'none';
+}
+</script>

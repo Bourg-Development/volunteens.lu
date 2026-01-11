@@ -1,0 +1,62 @@
+<h1>User Details</h1>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<div class="card">
+    <dl class="user-detail">
+        <dt>ID</dt>
+        <dd><%= userDetail.id %></dd>
+
+        <dt>Email</dt>
+        <dd><%= userDetail.email %></dd>
+
+        <dt>Role</dt>
+        <dd><%= userDetail.role %></dd>
+
+        <dt>Status</dt>
+        <dd>
+            <% if (userDetail.accountStatus === 'active') { %>
+                <span class="badge badge-active">Active</span>
+            <% } else if (userDetail.accountStatus === 'pending_approval') { %>
+                <span class="badge badge-pending">Pending Approval</span>
+            <% } else { %>
+                <span class="badge badge-locked"><%= userDetail.accountStatus %></span>
+            <% } %>
+        </dd>
+
+        <% if (userDetail.role === 'organization') { %>
+        <dt>Organization Name</dt>
+        <dd><%= userDetail.organizationName || 'N/A' %></dd>
+
+        <dt>Organization Type</dt>
+        <dd><%= userDetail.organizationType || 'N/A' %></dd>
+        <% } else { %>
+        <dt>First Name</dt>
+        <dd><%= userDetail.firstName || 'N/A' %></dd>
+
+        <dt>Last Name</dt>
+        <dd><%= userDetail.lastName || 'N/A' %></dd>
+        <% } %>
+
+        <dt>Created</dt>
+        <dd><%= new Date(userDetail.createdAt).toLocaleString() %></dd>
+    </dl>
+</div>
+
+<% if (userDetail.accountStatus === 'pending_approval') { %>
+<div class="card">
+    <h2 class="mb-1">Actions</h2>
+    <div class="actions">
+        <form method="POST" action="/users/<%= userDetail.id %>/approve">
+            <button type="submit" class="btn btn-success">Approve</button>
+        </form>
+        <form method="POST" action="/users/<%= userDetail.id %>/reject">
+            <button type="submit" class="btn btn-danger">Reject</button>
+        </form>
+    </div>
+</div>
+<% } %>
+
+<p style="margin-top:1rem"><a href="javascript:history.back()">Back</a></p>

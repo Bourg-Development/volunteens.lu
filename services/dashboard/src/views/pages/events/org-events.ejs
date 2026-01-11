@@ -1,0 +1,124 @@
+<div class="page-header">
+    <h1>My Events</h1>
+    <a href="/events/create" class="btn btn-primary">
+        <span class="material-symbols-outlined">add</span>
+        Create Event
+    </a>
+</div>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <%= typeof msg !== 'undefined' ? msg : 'Operation successful' %>
+    </div>
+<% } %>
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (events.length === 0) { %>
+    <div class="empty-state">
+        <span class="material-symbols-outlined">event</span>
+        <h3>No Events Yet</h3>
+        <p>Create your first event to start recruiting volunteers!</p>
+        <a href="/events/create" class="btn btn-primary">Create Event</a>
+    </div>
+<% } else { %>
+    <div class="events-grid">
+        <% events.forEach(event => {
+            // Calculate date range from shifts
+            const shifts = event.shifts || [];
+            let dateDisplay = 'No dates set';
+            if (shifts.length > 0) {
+                const sortedShifts = [...shifts].sort((a, b) => a.date.localeCompare(b.date));
+                const firstDate = new Date(sortedShifts[0].date);
+                const lastDate = new Date(sortedShifts[sortedShifts.length - 1].date);
+
+                if (sortedShifts[0].date === sortedShifts[sortedShifts.length - 1].date) {
+                    dateDisplay = firstDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+                } else {
+                    dateDisplay = firstDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) +
+                                  ' - ' +
+                                  lastDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                }
+            }
+        %>
+            <a href="/events/<%= event.id %>" class="event-card-link">
+                <div class="card event-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title"><%= event.title %></h3>
+                            <div class="card-subtitle"><%= dateDisplay %></div>
+                        </div>
+                        <span class="badge badge-<%= event.status %>"><%= event.status %></span>
+                    </div>
+
+                    <div class="event-meta">
+                        <% if (event.location) { %>
+                            <span class="event-meta-item">
+                                <span class="material-symbols-outlined">location_on</span>
+                                <%= event.location %>
+                            </span>
+                        <% } %>
+                        <span class="event-meta-item">
+                            <span class="material-symbols-outlined">schedule</span>
+                            <%= shifts.length %> shift<%= shifts.length !== 1 ? 's' : '' %>
+                        </span>
+                        <span class="event-meta-item">
+                            <span class="material-symbols-outlined">group</span>
+                            <%= event.signupCount || 0 %><%= event.capacity ? '/' + event.capacity : '' %> signups
+                        </span>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="view-details">
+                            View Details
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        <% }) %>
+    </div>
+<% } %>
+
+<style>
+.event-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.event-card-link .event-card {
+    cursor: pointer;
+}
+
+.event-card .card-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid rgba(14, 47, 82, 0.08);
+}
+
+.view-details {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+    font-size: 0.9rem;
+}
+
+.view-details .material-symbols-outlined {
+    font-size: 1.1rem;
+    transition: transform var(--transition-fast);
+}
+
+.event-card-link:hover .view-details .material-symbols-outlined {
+    transform: translateX(4px);
+}
+</style>

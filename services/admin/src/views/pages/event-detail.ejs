@@ -1,0 +1,159 @@
+<h1>Event Details</h1>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<div class="mb-1">
+    <a href="/events" class="btn btn-secondary">Back to Events</a>
+</div>
+
+<div class="card">
+    <h2><%= event.title %></h2>
+
+    <div class="detail-grid">
+        <div class="detail-item">
+            <strong>Status:</strong>
+            <% if (event.status === 'published') { %>
+                <span class="badge badge-active">Published</span>
+            <% } else if (event.status === 'draft') { %>
+                <span class="badge badge-pending">Draft</span>
+            <% } else if (event.status === 'pending') { %>
+                <span class="badge badge-pending">Pending</span>
+            <% } else if (event.status === 'cancelled') { %>
+                <span class="badge badge-locked">Cancelled</span>
+            <% } else { %>
+                <span class="badge"><%= event.status %></span>
+            <% } %>
+        </div>
+
+        <div class="detail-item">
+            <strong>Date:</strong>
+            <%= new Date(event.date).toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+            <% if (event.endDate) { %>
+                - <%= new Date(event.endDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) %>
+            <% } %>
+        </div>
+
+        <div class="detail-item">
+            <strong>Location:</strong>
+            <%= event.location || 'N/A' %>
+        </div>
+
+        <div class="detail-item">
+            <strong>Capacity:</strong>
+            <%= event.capacity ? event.capacity + ' spots' : 'Unlimited' %>
+        </div>
+
+        <div class="detail-item">
+            <strong>Signup Deadline:</strong>
+            <%= event.signupDeadline ? new Date(event.signupDeadline).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A' %>
+        </div>
+
+        <div class="detail-item">
+            <strong>Contact Email:</strong>
+            <%= event.contactEmail || 'N/A' %>
+        </div>
+
+        <div class="detail-item">
+            <strong>Created:</strong>
+            <%= new Date(event.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+        </div>
+    </div>
+
+    <% if (event.description) { %>
+    <div class="detail-item mt-1">
+        <strong>Description:</strong>
+        <p><%= event.description %></p>
+    </div>
+    <% } %>
+
+    <% if (event.requirements) { %>
+    <div class="detail-item mt-1">
+        <strong>Requirements:</strong>
+        <p><%= event.requirements %></p>
+    </div>
+    <% } %>
+</div>
+
+<div class="card mt-1">
+    <h3>Actions</h3>
+    <div class="actions-row">
+        <% if (event.status !== 'published') { %>
+        <form method="POST" action="/events/<%= event.id %>/status" style="display:inline">
+            <input type="hidden" name="status" value="published">
+            <button type="submit" class="btn btn-success">Publish</button>
+        </form>
+        <% } %>
+
+        <% if (event.status !== 'cancelled') { %>
+        <form method="POST" action="/events/<%= event.id %>/status" style="display:inline" onsubmit="return confirm('Cancel this event?')">
+            <input type="hidden" name="status" value="cancelled">
+            <button type="submit" class="btn btn-warning">Cancel Event</button>
+        </form>
+        <% } %>
+
+        <form method="POST" action="/events/<%= event.id %>/delete" style="display:inline" onsubmit="return confirm('Delete this event permanently?')">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-1">
+    <h3>Signups (<%= signups.length %>)</h3>
+    <% if (signups.length === 0) { %>
+        <p>No signups yet.</p>
+    <% } else { %>
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Signed Up</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% signups.forEach(signup => { %>
+            <tr>
+                <td><%= signup.studentName || 'N/A' %></td>
+                <td><%= signup.studentEmail || 'N/A' %></td>
+                <td>
+                    <% if (signup.status === 'confirmed') { %>
+                        <span class="badge badge-active">Confirmed</span>
+                    <% } else if (signup.status === 'pending') { %>
+                        <span class="badge badge-pending">Pending</span>
+                    <% } else if (signup.status === 'cancelled') { %>
+                        <span class="badge badge-locked">Cancelled</span>
+                    <% } else if (signup.status === 'attended') { %>
+                        <span class="badge badge-active">Attended</span>
+                    <% } else { %>
+                        <span class="badge"><%= signup.status %></span>
+                    <% } %>
+                </td>
+                <td><%= new Date(signup.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <% } %>
+</div>
+
+<style>
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+.detail-item {
+    padding: 0.5rem 0;
+}
+.actions-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.mt-1 {
+    margin-top: 1rem;
+}
+</style>

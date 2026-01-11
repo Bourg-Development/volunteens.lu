@@ -1,0 +1,74 @@
+<h1>Events Management</h1>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<div class="mb-1">
+    <div class="filters">
+        <a href="/events" class="btn <%= currentStatus === 'all' ? 'btn-primary' : 'btn-secondary' %>">All</a>
+        <a href="/events?status=published" class="btn <%= currentStatus === 'published' ? 'btn-primary' : 'btn-secondary' %>">Published</a>
+        <a href="/events?status=draft" class="btn <%= currentStatus === 'draft' ? 'btn-primary' : 'btn-secondary' %>">Draft</a>
+        <a href="/events?status=pending" class="btn <%= currentStatus === 'pending' ? 'btn-primary' : 'btn-secondary' %>">Pending</a>
+        <a href="/events?status=cancelled" class="btn <%= currentStatus === 'cancelled' ? 'btn-primary' : 'btn-secondary' %>">Cancelled</a>
+    </div>
+</div>
+
+<div class="card">
+    <% if (events.length === 0) { %>
+        <p>No events found.</p>
+    <% } else { %>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Signups</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% events.forEach(event => { %>
+            <tr>
+                <td><%= event.title %></td>
+                <td><%= new Date(event.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></td>
+                <td><%= event.location || 'N/A' %></td>
+                <td>
+                    <% if (event.status === 'published') { %>
+                        <span class="badge badge-active">Published</span>
+                    <% } else if (event.status === 'draft') { %>
+                        <span class="badge badge-pending">Draft</span>
+                    <% } else if (event.status === 'pending') { %>
+                        <span class="badge badge-pending">Pending</span>
+                    <% } else if (event.status === 'cancelled') { %>
+                        <span class="badge badge-locked">Cancelled</span>
+                    <% } else { %>
+                        <span class="badge"><%= event.status %></span>
+                    <% } %>
+                </td>
+                <td>
+                    <%= event.signupCount || 0 %><% if (event.capacity) { %>/<%= event.capacity %><% } %>
+                </td>
+                <td class="actions">
+                    <a href="/events/<%= event.id %>" class="btn btn-primary">View</a>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <% if (totalPages > 1) { %>
+    <div class="pagination">
+        <% if (page > 1) { %>
+            <a href="/events?page=<%= page - 1 %><%= currentStatus !== 'all' ? '&status=' + currentStatus : '' %>" class="btn btn-secondary">Previous</a>
+        <% } %>
+        <span>Page <%= page %> of <%= totalPages %></span>
+        <% if (page < totalPages) { %>
+            <a href="/events?page=<%= page + 1 %><%= currentStatus !== 'all' ? '&status=' + currentStatus : '' %>" class="btn btn-secondary">Next</a>
+        <% } %>
+    </div>
+    <% } %>
+    <% } %>
+</div>

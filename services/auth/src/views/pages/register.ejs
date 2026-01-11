@@ -1,0 +1,131 @@
+<div class="auth-page">
+    <div class="auth-wrapper">
+        <div class="auth-branding">
+            <img src="/static/media/branding/logo_slogan.png" alt="Volunteens" class="logo">
+            <h2>Join our community!</h2>
+            <p>Create an account to start volunteering, discover events, and make a difference in Luxembourg.</p>
+        </div>
+        <div class="auth-form-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>Create Account</h1>
+                    <p>Select your account type to get started</p>
+                </div>
+
+                <form method="post" action="/api/v1/auth/register" id="registerForm">
+                    <!-- Account Type Selection -->
+                    <div class="account-type-selector">
+                        <label class="account-type-option">
+                            <input type="radio" name="accountType" value="student" checked>
+                            <div class="account-type-card">
+                                <div class="account-type-icon">
+                                    <span class="material-icons">
+                                        school
+                                    </span>
+                                </div>
+                                <div class="account-type-label">Student</div>
+                                <div class="account-type-desc">I want to volunteer</div>
+                            </div>
+                        </label>
+                        <label class="account-type-option">
+                            <input type="radio" name="accountType" value="organization">
+                            <div class="account-type-card">
+                                <div class="account-type-icon">
+                                    <span class="material-icons">
+                                        business_center
+                                    </span>
+                                </div>
+                                <div class="account-type-label">Organization</div>
+                                <div class="account-type-desc">I need volunteers</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Student Fields -->
+                    <div id="studentFields" class="dynamic-fields">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" name="firstName" placeholder="John">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" name="lastName" placeholder="Doe">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Organization Fields -->
+                    <div id="organizationFields" class="dynamic-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="organizationName">Organization Name</label>
+                            <input type="text" id="organizationName" name="organizationName" placeholder="Your Organization">
+                        </div>
+                        <div class="form-group">
+                            <label for="organizationType">Organization Type<span class="optional">(optional)</span></label>
+                            <select name="organizationType" id="organizationType">
+                                <option value="tech">Tech</option>
+                                <option value="marketing">Marketing</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Common Fields -->
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="acceptTerms" name="acceptTerms" required>
+                            <span>I agree to the <a href="<%= webUiUrl %>/docs/legal/terms" target="_blank">Terms of Service</a> and <a href="<%= webUiUrl %>/docs/legal/privacy-policy" target="_blank">Privacy Policy</a></span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                </form>
+
+                <div class="form-footer">
+                    <p>Already have an account? <a href="/login">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const accountTypeInputs = document.querySelectorAll('input[name="accountType"]');
+    const studentFields = document.getElementById('studentFields');
+    const organizationFields = document.getElementById('organizationFields');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const orgNameInput = document.getElementById('organizationName');
+
+    function updateFields() {
+        const selectedType = document.querySelector('input[name="accountType"]:checked').value;
+
+        if (selectedType === 'student') {
+            studentFields.style.display = 'block';
+            organizationFields.style.display = 'none';
+            firstNameInput.required = true;
+            lastNameInput.required = true;
+            orgNameInput.required = false;
+        } else {
+            studentFields.style.display = 'none';
+            organizationFields.style.display = 'block';
+            firstNameInput.required = false;
+            lastNameInput.required = false;
+            orgNameInput.required = true;
+        }
+    }
+
+    accountTypeInputs.forEach(input => {
+        input.addEventListener('change', updateFields);
+    });
+
+    // Initialize
+    updateFields();
+</script>

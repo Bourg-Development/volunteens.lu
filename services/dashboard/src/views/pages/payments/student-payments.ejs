@@ -1,0 +1,189 @@
+<div class="page-header">
+    <h1>My Payments</h1>
+</div>
+
+<% if (typeof success !== 'undefined' && success && typeof msg !== 'undefined') { %>
+    <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <%= msg %>
+    </div>
+<% } %>
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (invoices.length === 0) { %>
+    <div class="empty-state">
+        <span class="material-symbols-outlined">payments</span>
+        <h3>No Invoices Yet</h3>
+        <p>Invoices will appear here after you attend events and are marked as present by the organizer.</p>
+        <a href="/events" class="btn btn-primary">Browse Events</a>
+    </div>
+<% } else { %>
+    <div class="invoices-list">
+        <% invoices.forEach(invoice => { %>
+            <div class="card invoice-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title"><%= invoice.eventTitle %></h3>
+                        <div class="card-subtitle">Invoice #<%= invoice.invoiceNumber %></div>
+                    </div>
+                    <span class="badge badge-<%= invoice.status %>">
+                        <%= invoice.status === 'pending' ? 'Awaiting Payment' : invoice.status === 'paid' ? 'Paid' : 'Cancelled' %>
+                    </span>
+                </div>
+
+                <div class="invoice-details">
+                    <div class="invoice-detail-row">
+                        <span class="invoice-label">Organization</span>
+                        <span class="invoice-value"><%= invoice.organizationName || invoice.organizationEmail %></span>
+                    </div>
+                    <div class="invoice-detail-row">
+                        <span class="invoice-label">Event Date</span>
+                        <span class="invoice-value"><%= new Date(invoice.eventDate).toLocaleDateString('en-GB', { dateStyle: 'medium' }) %></span>
+                    </div>
+                    <div class="invoice-detail-row">
+                        <span class="invoice-label">Hours Worked</span>
+                        <span class="invoice-value"><%= invoice.hours %> hours @ <%= invoice.currency %> <%= invoice.hourlyRate %>/hr</span>
+                    </div>
+                    <div class="invoice-detail-row invoice-total">
+                        <span class="invoice-label">Total Amount</span>
+                        <span class="invoice-amount"><%= invoice.currency %> <%= invoice.amount %></span>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <% if (invoice.status === 'pending') { %>
+                        <form action="/payments/<%= invoice.id %>/received" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-primary" onclick="return confirm('Confirm that you have received this payment?')">
+                                <span class="material-symbols-outlined">check</span>
+                                Mark as Received
+                            </button>
+                        </form>
+                        <span class="invoice-sent-info">
+                            <span class="material-symbols-outlined">schedule</span>
+                            Invoice sent <%= new Date(invoice.sentAt || invoice.createdAt).toLocaleDateString('en-GB') %>
+                        </span>
+                    <% } else if (invoice.status === 'paid') { %>
+                        <span class="payment-received">
+                            <span class="material-symbols-outlined">verified</span>
+                            Payment received <%= new Date(invoice.paidAt).toLocaleDateString('en-GB') %>
+                        </span>
+                    <% } %>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+<% } %>
+
+<style>
+.invoices-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.invoice-card {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.invoice-card:hover {
+    transform: translateY(-2px);
+}
+
+.invoice-details {
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    background: var(--color-background-alt);
+    border-radius: var(--radius-sm);
+}
+
+.invoice-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid rgba(14, 47, 82, 0.08);
+}
+
+.invoice-detail-row:last-child {
+    border-bottom: none;
+}
+
+.invoice-label {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.invoice-value {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-dark);
+}
+
+.invoice-total {
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 2px solid var(--color-primary);
+    border-bottom: none;
+}
+
+.invoice-total .invoice-label {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-dark);
+}
+
+.invoice-amount {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+}
+
+.invoice-sent-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.invoice-sent-info .material-symbols-outlined {
+    font-size: 1rem;
+}
+
+.payment-received {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: #27ae60;
+    font-weight: var(--font-weight-medium);
+}
+
+.payment-received .material-symbols-outlined {
+    color: #27ae60;
+}
+
+@media (max-width: 768px) {
+    .invoice-detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .invoice-amount {
+        font-size: 1.1rem;
+    }
+
+    .card-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .invoice-sent-info {
+        justify-content: center;
+        margin-top: var(--spacing-xs);
+    }
+}
+</style>

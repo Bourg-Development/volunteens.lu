@@ -1,0 +1,173 @@
+version: '3.9'
+
+services:
+  web-ui:
+    build:
+      context: ./services/web-ui
+    ports:
+      - "${WEB_UI_PORT}:3000"
+    env_file:
+      - ./.env
+    environment:
+      PORT: ${WEB_UI_PORT}
+      API_URL: ${API_URL}
+      EVENTS_URL: ${EVENTS_URL}
+      AUTH_URL: ${AUTH_URL}
+      DASH_URL: ${DASH_URL}
+    restart: always
+  auth:
+    build:
+      context: ./services/auth
+    ports:
+      - "${AUTH_PORT}:3000"
+    env_file:
+      - ./.env
+    environment:
+      API_URL: ${API_URL}
+      DASH_URL: ${DASH_URL}
+      ADMIN_URL: ${ADMIN_URL}
+      AUTH_URL: ${AUTH_URL}
+      EMAIL_URL: "http://email:3000"
+      EMAIL_SERVICE_SECRET: ${EMAIL_SERVICE_SECRET}
+
+    restart: always
+  dashboard:
+    build:
+      context: ./services/dashboard
+    ports:
+      - "${DASH_PORT}:3000"
+    env_file:
+      - ./.env
+    environment:
+      AUTH_URL: ${AUTH_URL}
+      EVENTS_URL: ${EVENTS_URL}
+      PAYMENT_INTERNAL_URL: "http://payment:3000"
+    depends_on:
+      - auth
+      - events
+      - payment
+    restart: always
+  admin:
+    build:
+      context: ./services/admin
+    ports:
+      - "${ADMIN_PORT}:3003"
+    env_file:
+      - ./.env
+    environment:
+      AUTH_URL: ${AUTH_URL}
+      EVENTS_URL: "http://events:3000"
+      EMAIL_URL: "http://email:3000"
+      EMAIL_SERVICE_SECRET: ${EMAIL_SERVICE_SECRET}
+      ADMIN_EMAILS: ${ADMIN_EMAILS}
+      ADMIN_SERVICE_SECRET: ${ADMIN_SERVICE_SECRET}
+    depends_on:
+      - auth
+      - auth-db
+      - events
+      - email
+    restart: always
+  events:
+    build:
+      context: ./services/events
+    ports:
+      - "${EVENTS_PORT}:3000"
+    env_file:
+      - ./.env
+    environment:
+      AUTH_URL: ${AUTH_URL}
+      EVENTS_URL: ${EVENTS_URL}
+      EMAIL_URL: "http://email:3000"
+      EMAIL_SERVICE_SECRET: ${EMAIL_SERVICE_SECRET}
+      PAYMENT_INTERNAL_URL: "http://payment:3000"
+      PAYMENT_SERVICE_SECRET: ${PAYMENT_SERVICE_SECRET}
+    depends_on:
+      - auth
+      - events-db
+      - email
+    restart: always
+  email:
+    build:
+      context: ./services/email
+    ports:
+      - "${EMAIL_PORT}:3000"
+    env_file:
+      - ./.env
+    environment:
+      EMAIL_SERVICE_SECRET: ${EMAIL_SERVICE_SECRET}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+    depends_on:
+      - mailhog
+    restart: always
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    restart: always
+  payment:
+    build:
+      context: ./services/payment
+    ports:
+      - "${PAYMENT_PORT}:3000"
+    env_file:
+      - ./.env
+    environment:
+      AUTH_URL: ${AUTH_URL}
+      EMAIL_URL: "http://email:3000"
+      EMAIL_SERVICE_SECRET: ${EMAIL_SERVICE_SECRET}
+      ADMIN_INTERNAL_URL: "http://admin:3003"
+      ADMIN_SERVICE_SECRET: ${ADMIN_SERVICE_SECRET}
+      PAYMENT_SERVICE_SECRET: ${PAYMENT_SERVICE_SECRET}
+      PAYMENT_DB_HOST: payment-db
+      PAYMENT_DB_PORT: 5432
+      PAYMENT_DB_USER: ${PAYMENT_DB_USER}
+      PAYMENT_DB_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      PAYMENT_DB_NAME: ${PAYMENT_DB_NAME}
+    depends_on:
+      - auth
+      - payment-db
+      - email
+    restart: always
+  payment-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${PAYMENT_DB_USER}
+      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD}
+      POSTGRES_DB: ${PAYMENT_DB_NAME}
+    volumes:
+      - payment_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    restart: always
+  events-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${EVENTS_DB_USER}
+      POSTGRES_PASSWORD: ${EVENTS_DB_PASSWORD}
+      POSTGRES_DB: ${EVENTS_DB_NAME}
+    volumes:
+      - events_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    restart: always
+  auth-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+volumes:
+  auth_data:
+  events_data:
+  payment_data:

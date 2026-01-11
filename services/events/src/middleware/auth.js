@@ -1,0 +1,85 @@
+const logger = require('../utils/logger');
+const servicesConfig = require('../config/services');
+
+const ROLE_HIERARCHY = ['student', 'organization', 'moderator', 'admin', 'super_admin'];
+
+async function verifyToken(req) {
+    const accessToken = extractToken(req);
+
+    if (!accessToken) {
+        return { valid: false, error: 'No access token provided', status: 401 };
+    }
+
+    let response;
+    try {
+        response = await fetch('http://auth:3000/api/v1/internal/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken }),
+        });
+    } catch (err) {
+        logger.error('Error verifying access token with auth service:', err);
+        return { valid: false, error: 'Authentication service unavailable', status: 503 };
+    }
+
+    const data = await response.json();
+
+    if (!data.valid) {
+        return { valid: false, error: data.error || 'Invalid or expired token', status: 401 };
+    }
+
+    return { valid: true, user: data.user };
+}
+
+const requireAuth = async (req, res, next) => {
+    const result = await verifyToken(req);
+
+    if (!result.valid) {
+        return res.status(result.status).json({ success: false, error: result.error });
+    }
+
+    req.user = result.user;
+    return next();
+};
+
+const requireRole = (...allowedRoles) => {
+    return async (req, res, next) => {
+        const result = await verifyToken(req);
+
+        if (!result.valid) {
+            return res.status(result.status).json({ success: false, error: result.error });
+        }
+
+        req.user = result.user;
+
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({
+                success: false,
+                error: `Access denied. Required role: ${allowedRoles.join(' or ')}`,
+            });
+        }
+
+        return next();
+    };
+};
+
+const requireOrganization = requireRole('organization', 'admin', 'super_admin');
+const requireStudent = requireRole('student', 'admin', 'super_admin');
+const requireAdmin = requireRole('moderator', 'admin', 'super_admin');
+
+function extractToken(req) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        return authHeader.substring(7);
+    }
+    return req.cookies?.accessToken;
+}
+
+module.exports = {
+    requireAuth,
+    requireRole,
+    requireOrganization,
+    requireStudent,
+    requireAdmin,
+    ROLE_HIERARCHY,
+};

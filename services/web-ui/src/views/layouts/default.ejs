@@ -34,6 +34,11 @@
 <!-- Common Scripts -->
 <script src="/static/javascript/common/animations.js"></script>
 <script src="/static/javascript/common/navbar.js"></script>
+<script>
+    window.EVENTS_URL = '<%= eventsUrl %>';
+    window.AUTH_URL = '<%= authUrl %>';
+    window.DASH_URL = '<%= dashUrl %>';
+</script>
 
 <!-- Page Specific Scripts -->
 <%- defineContent('scripts') %>

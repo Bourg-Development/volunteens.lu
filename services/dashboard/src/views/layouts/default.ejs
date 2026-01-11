@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Dashboard' %> | Volunteens</title>
+
+    <!-- External Resources -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <!-- Common Styles -->
+    <link rel="stylesheet" href="/static/stylesheets/common/variables.css">
+    <link rel="stylesheet" href="/static/stylesheets/common/reset.css">
+    <link rel="stylesheet" href="/static/stylesheets/common/buttons.css">
+    <link rel="stylesheet" href="/static/stylesheets/pages/dashboard.css">
+    <link rel="stylesheet" href="/static/stylesheets/components/shift-calendar.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="sidebar-brand">
+                    <img src="/static/media/branding/logo_icon_only.png" alt="Volunteens" class="sidebar-logo">
+                    <span>Volunteens</span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <% if (typeof user !== 'undefined' && user.role === 'organization') { %>
+                    <a href="/events" class="sidebar-link <%= typeof activeNav !== 'undefined' && activeNav === 'events' ? 'active' : '' %>">
+                        <span class="material-symbols-outlined">event</span>
+                        My Events
+                    </a>
+
+                    <% if (typeof currentEvent !== 'undefined' && currentEvent) { %>
+                        <%
+                            // Calculate if attendance should be visible (day before first shift or later)
+                            let showAttendance = true;
+                            if (typeof isProduction !== 'undefined' && isProduction) {
+                                showAttendance = false;
+                                const eventShifts = currentEvent.shifts || [];
+                                if (eventShifts.length > 0) {
+                                    const sortedShifts = [...eventShifts].sort((a, b) => a.date.localeCompare(b.date));
+                                    const firstShiftDate = new Date(sortedShifts[0].date);
+                                    const dayBeforeEvent = new Date(firstShiftDate);
+                                    dayBeforeEvent.setDate(dayBeforeEvent.getDate() - 1);
+                                    const today = new Date();
+                                    today.setHours(0, 0, 0, 0);
+                                    dayBeforeEvent.setHours(0, 0, 0, 0);
+                                    showAttendance = today >= dayBeforeEvent;
+                                }
+                            }
+                        %>
+                        <div class="sidebar-event-section">
+                            <div class="sidebar-event-title" title="<%= currentEvent.title %>">
+                                <span class="material-symbols-outlined">folder_open</span>
+                                <%= currentEvent.title.length > 18 ? currentEvent.title.substring(0, 18) + '...' : currentEvent.title %>
+                            </div>
+                            <div class="sidebar-event-nav">
+                                <a href="/events/<%= currentEvent.id %>" class="sidebar-sublink <%= typeof activeSubNav !== 'undefined' && activeSubNav === 'overview' ? 'active' : '' %>">
+                                    <span class="material-symbols-outlined">dashboard</span>
+                                    Overview
+                                </a>
+                                <a href="/events/<%= currentEvent.id %>/signups" class="sidebar-sublink <%= typeof activeSubNav !== 'undefined' && activeSubNav === 'signups' ? 'active' : '' %>">
+                                    <span class="material-symbols-outlined">group</span>
+                                    Signups
+                                </a>
+                                <a href="/events/<%= currentEvent.id %>/shifts" class="sidebar-sublink <%= typeof activeSubNav !== 'undefined' && activeSubNav === 'shifts' ? 'active' : '' %>">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Shifts
+                                </a>
+                                <% if (showAttendance) { %>
+                                    <a href="/events/<%= currentEvent.id %>/attendance" class="sidebar-sublink <%= typeof activeSubNav !== 'undefined' && activeSubNav === 'attendance' ? 'active' : '' %>">
+                                        <span class="material-symbols-outlined">fact_check</span>
+                                        Attendance
+                                    </a>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } else if (typeof user !== 'undefined' && user.role === 'student') { %>
+                    <a href="/events" class="sidebar-link <%= typeof activeNav !== 'undefined' && activeNav === 'events' ? 'active' : '' %>">
+                        <span class="material-symbols-outlined">event</span>
+                        Events
+                    </a>
+                    <a href="/payments" class="sidebar-link <%= typeof activeNav !== 'undefined' && activeNav === 'payments' ? 'active' : '' %>">
+                        <span class="material-symbols-outlined">payments</span>
+                        Payments
+                    </a>
+                <% } %>
+            </nav>
+
+            <div class="sidebar-footer">
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <div class="sidebar-user">
+                        <span class="material-symbols-outlined">account_circle</span>
+                        <div class="sidebar-user-info">
+                            <span class="sidebar-user-email"><%= user.email %></span>
+                            <span class="sidebar-user-role"><%= user.role %></span>
+                        </div>
+                    </div>
+                    <a href="<%= typeof authUrl !== 'undefined' ? authUrl : '' %>/api/v1/auth/logout" class="sidebar-link logout-link">
+                        <span class="material-symbols-outlined">logout</span>
+                        Logout
+                    </a>
+                <% } %>
+            </div>
+        </aside>
+
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="/" class="mobile-brand">
+                <img src="/static/media/branding/logo_icon_only.png" alt="Volunteens" class="mobile-logo">
+            </a>
+        </header>
+
+        <!-- Overlay for mobile -->
+        <div class="sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <%- body %>
+        </main>
+    </div>
+
+    <script>
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+
+        toggle?.addEventListener('click', () => {
+            toggle.classList.toggle('active');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        });
+
+        overlay?.addEventListener('click', () => {
+            toggle.classList.remove('active');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+    </script>
+</body>
+</html>

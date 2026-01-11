@@ -1,0 +1,91 @@
+<div class="page-header">
+    <div>
+        <h1>Signups</h1>
+        <p class="page-subtitle"><%= event.title %></p>
+    </div>
+</div>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success">
+        <span class="material-symbols-outlined">check_circle</span>
+        <%= typeof msg !== 'undefined' ? msg : 'Operation successful' %>
+    </div>
+<% } %>
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error">
+        <span class="material-symbols-outlined">error</span>
+        <%= error %>
+    </div>
+<% } %>
+
+<% if (signups.length === 0) { %>
+    <div class="empty-state">
+        <span class="material-symbols-outlined">group_off</span>
+        <h3>No Signups Yet</h3>
+        <p>No one has signed up for this event yet.</p>
+    </div>
+<% } else { %>
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Signed Up</th>
+                    <th>Status</th>
+                    <th>Message</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% signups.forEach(signup => { %>
+                    <tr>
+                        <td><%= signup.studentId %></td>
+                        <td><%= new Date(signup.createdAt).toLocaleString('en-GB') %></td>
+                        <td><span class="badge badge-<%= signup.status %>"><%= signup.status %></span></td>
+                        <td><%= signup.message || '-' %></td>
+                        <td>
+                            <% if (signup.status === 'pending') { %>
+                                <form action="/events/<%= event.id %>/signups/<%= signup.id %>" method="POST" style="display: inline;">
+                                    <input type="hidden" name="status" value="confirmed">
+                                    <button type="submit" class="btn btn-sm btn-success">Confirm</button>
+                                </form>
+                            <% } %>
+                            <% if (signup.status !== 'cancelled') { %>
+                                <form action="/events/<%= event.id %>/signups/<%= signup.id %>" method="POST" style="display: inline;">
+                                    <input type="hidden" name="status" value="cancelled">
+                                    <button type="submit" class="btn btn-sm btn-warning">Cancel</button>
+                                </form>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card" style="margin-top: var(--spacing-md);">
+        <h3>Summary</h3>
+        <div class="event-meta" style="font-size: 1rem;">
+            <span class="event-meta-item">
+                <span class="material-symbols-outlined">pending</span>
+                Pending: <%= signups.filter(s => s.status === 'pending').length %>
+            </span>
+            <span class="event-meta-item">
+                <span class="material-symbols-outlined">check_circle</span>
+                Confirmed: <%= signups.filter(s => s.status === 'confirmed').length %>
+            </span>
+            <span class="event-meta-item">
+                <span class="material-symbols-outlined">cancel</span>
+                Cancelled: <%= signups.filter(s => s.status === 'cancelled').length %>
+            </span>
+        </div>
+    </div>
+<% } %>
+
+<style>
+.page-subtitle {
+    color: var(--color-text-muted);
+    margin: var(--spacing-xs) 0 0 0;
+    font-size: 0.95rem;
+}
+</style>

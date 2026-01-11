@@ -1,0 +1,55 @@
+<h1>Admin Dashboard</h1>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3><%= stats.pending %></h3>
+        <p>Pending Approvals</p>
+    </div>
+    <div class="stat-card">
+        <h3><%= stats.organizations %></h3>
+        <p>Total Organizations</p>
+    </div>
+    <div class="stat-card">
+        <h3><%= stats.active %></h3>
+        <p>Active Organizations</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="mb-1">Recent Pending Approvals</h2>
+    <% if (pending.length === 0) { %>
+        <p>No pending approvals.</p>
+    <% } else { %>
+    <table>
+        <thead>
+            <tr>
+                <th>Organization</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% pending.slice(0, 5).forEach(org => { %>
+            <tr>
+                <td><%= org.organizationName || 'N/A' %></td>
+                <td><%= org.email %></td>
+                <td><%= org.organizationType || 'N/A' %></td>
+                <td><%= new Date(org.createdAt).toLocaleDateString() %></td>
+                <td class="actions">
+                    <a href="/users/<%= org.id %>" class="btn btn-primary">View</a>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <% if (pending.length > 5) { %>
+        <p style="margin-top:1rem"><a href="/pending">View all <%= pending.length %> pending</a></p>
+    <% } %>
+    <% } %>
+</div>

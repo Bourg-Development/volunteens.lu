@@ -4,9 +4,9 @@
 <!-- Hero Section -->
 <section class="about-hero">
     <div class="about-hero-content fade-in">
-        <h1>About <span class="gradient-text">Volunteens</span></h1>
+        <h1><%= cms.hero_title || 'About' %> <span class="gradient-text">Volunteens</span></h1>
         <p>
-            Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod.
+            <%= cms.hero_subtitle || 'Empowering young people to make a difference in their communities.' %>
         </p>
     </div>
 </section>
@@ -15,16 +15,9 @@
 <section class="company-overview">
     <div class="overview-container">
         <div class="overview-content slide-in-left">
-            <h2>Who We Are</h2>
+            <h2><%= cms.whoweare_title || 'Who We Are' %></h2>
             <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute.
-            </p>
-            <p>
-                Irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus.
+                <%= cms.whoweare_text || 'Volunteens is a platform dedicated to connecting young volunteers with organizations that need their help. We believe in the power of youth to create positive change and provide the tools to make volunteering accessible, rewarding, and impactful.' %>
             </p>
         </div>
         <div class="overview-visual slide-in-right">
@@ -37,55 +30,50 @@
 
 <!-- Timeline -->
 <section class="timeline-section">
-    <h2 class="section-title fade-in">Our Journey</h2>
+    <h2 class="section-title fade-in"><%= cms.timeline_title || 'Our Journey' %></h2>
     <div class="timeline">
         <div class="timeline-item slide-in-left">
-            <div class="timeline-year">2020</div>
+            <div class="timeline-year"><%= cms.timeline_1_year || '2020' %></div>
             <div class="timeline-content">
-                <h3>Foundation</h3>
+                <h3><%= cms.timeline_1_title || 'Foundation' %></h3>
                 <p>
-                    Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua ut enim.
+                    <%= cms.timeline_1_text || 'Volunteens was founded with a mission to connect young people with volunteer opportunities.' %>
                 </p>
             </div>
         </div>
         <div class="timeline-item slide-in-right">
-            <div class="timeline-year">2021</div>
+            <div class="timeline-year"><%= cms.timeline_2_year || '2021' %></div>
             <div class="timeline-content">
-                <h3>First Milestone</h3>
+                <h3><%= cms.timeline_2_title || 'First Milestone' %></h3>
                 <p>
-                    Ad minim veniam quis nostrud exercitation ullamco laboris nisi ut
-                    aliquip ex ea commodo consequat duis aute irure dolor.
+                    <%= cms.timeline_2_text || 'Reached our first 1,000 registered volunteers and partnered with 50 organizations.' %>
                 </p>
             </div>
         </div>
         <div class="timeline-item slide-in-left">
-            <div class="timeline-year">2022</div>
+            <div class="timeline-year"><%= cms.timeline_3_year || '2022' %></div>
             <div class="timeline-content">
-                <h3>Growth & Expansion</h3>
+                <h3><%= cms.timeline_3_title || 'Growth & Expansion' %></h3>
                 <p>
-                    In reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                    nulla pariatur excepteur sint occaecat cupidatat non.
+                    <%= cms.timeline_3_text || 'Expanded our platform with new features and grew to serve the entire Luxembourg region.' %>
                 </p>
             </div>
         </div>
         <div class="timeline-item slide-in-right">
-            <div class="timeline-year">2023</div>
+            <div class="timeline-year"><%= cms.timeline_4_year || '2023' %></div>
             <div class="timeline-content">
-                <h3>New Programs</h3>
+                <h3><%= cms.timeline_4_title || 'New Programs' %></h3>
                 <p>
-                    Proident sunt in culpa qui officia deserunt mollit anim id est
-                    laborum sed ut perspiciatis unde omnis iste.
+                    <%= cms.timeline_4_text || 'Launched new programs including summer volunteer camps and school partnerships.' %>
                 </p>
             </div>
         </div>
         <div class="timeline-item slide-in-left">
-            <div class="timeline-year">2024</div>
+            <div class="timeline-year"><%= cms.timeline_5_year || '2024' %></div>
             <div class="timeline-content">
-                <h3>Looking Forward</h3>
+                <h3><%= cms.timeline_5_title || 'Looking Forward' %></h3>
                 <p>
-                    Natus error sit voluptatem accusantium doloremque laudantium totam
-                    rem aperiam eaque ipsa quae ab illo inventore veritatis.
+                    <%= cms.timeline_5_text || 'Continuing to grow and innovate, with plans to expand across Europe.' %>
                 </p>
             </div>
         </div>
@@ -94,46 +82,46 @@
 
 <!-- Team Section -->
 <section class="team-section">
-    <h2 class="section-title fade-in">Volunteens Team</h2>
+    <h2 class="section-title fade-in"><%= cms.team_title || 'Volunteens Team' %></h2>
     <div class="team-grid">
         <div class="team-card fade-in">
             <div class="team-image">
                 <span class="material-symbols-outlined">person</span>
             </div>
-            <h3>Max Mustermann</h3>
-            <p class="team-role">CEO</p>
+            <h3><%= cms.team_1_name || 'Max Mustermann' %></h3>
+            <p class="team-role"><%= cms.team_1_role || 'CEO' %></p>
             <p class="team-bio">
-                Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt.
+                <%= cms.team_1_bio || 'Passionate about youth empowerment and social impact.' %>
             </p>
         </div>
         <div class="team-card fade-in">
             <div class="team-image">
                 <span class="material-symbols-outlined">person</span>
             </div>
-            <h3>Jempi Mustermann</h3>
-            <p class="team-role">CFO</p>
+            <h3><%= cms.team_2_name || 'Jempi Mustermann' %></h3>
+            <p class="team-role"><%= cms.team_2_role || 'CFO' %></p>
             <p class="team-bio">
-                Ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation.
+                <%= cms.team_2_bio || 'Expert in nonprofit finance and sustainable growth.' %>
             </p>
         </div>
         <div class="team-card fade-in">
             <div class="team-image">
                 <span class="material-symbols-outlined">person</span>
             </div>
-            <h3>Alex Mustermann</h3>
-            <p class="team-role">CTO</p>
+            <h3><%= cms.team_3_name || 'Alex Mustermann' %></h3>
+            <p class="team-role"><%= cms.team_3_role || 'CTO' %></p>
             <p class="team-bio">
-                Ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor.
+                <%= cms.team_3_bio || 'Building technology that connects communities.' %>
             </p>
         </div>
         <div class="team-card fade-in">
             <div class="team-image">
                 <span class="material-symbols-outlined">person</span>
             </div>
-            <h3>Hugo Mustermann</h3>
-            <p class="team-role">COO</p>
+            <h3><%= cms.team_4_name || 'Hugo Mustermann' %></h3>
+            <p class="team-role"><%= cms.team_4_role || 'COO' %></p>
             <p class="team-bio">
-                In reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                <%= cms.team_4_bio || 'Ensuring smooth operations and volunteer satisfaction.' %>
             </p>
         </div>
     </div>
@@ -144,13 +132,11 @@
     <div class="bubble bubble-1"></div>
     <div class="bubble bubble-2"></div>
     <div class="cta-container fade-in">
-        <h2>Need Motivated Helpers?</h2>
+        <h2><%= cms.cta_org_title || 'Need Motivated Helpers?' %></h2>
         <p>
-            Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod.
-            Tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam,
-            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea.
+            <%= cms.cta_org_text || 'Partner with us to find dedicated young volunteers for your organization.' %>
         </p>
-        <a href="#contact" class="cta-btn">Find Your Team</a>
+        <a href="<%= authUrl %>/register?type=organization" class="cta-btn"><%= cms.cta_org_button || 'Find Your Team' %></a>
     </div>
 </section>
 
@@ -159,12 +145,11 @@
     <div class="bubble bubble-1"></div>
     <div class="bubble bubble-2"></div>
     <div class="cta-container fade-in">
-        <h2>Are You a Student?</h2>
+        <h2><%= cms.cta_student_title || 'Are You a Student?' %></h2>
         <p>
-            Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor.
-            Incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud.
+            <%= cms.cta_student_text || 'Start your volunteer journey today and make a real difference.' %>
         </p>
-        <a href="#contact" class="cta-btn">Start Your Journey</a>
+        <a href="<%= authUrl %>/register" class="cta-btn"><%= cms.cta_student_button || 'Start Your Journey' %></a>
     </div>
 </section>
 

@@ -14,6 +14,9 @@ services:
       EVENTS_URL: ${EVENTS_URL}
       AUTH_URL: ${AUTH_URL}
       DASH_URL: ${DASH_URL}
+      ADMIN_INTERNAL_URL: "http://admin:3003"
+    depends_on:
+      - admin
     restart: always
   auth:
     build:

@@ -12,6 +12,30 @@ const startTime = Date.now();
 const EVENTS_URL = process.env.EVENTS_URL || 'http://localhost:3004';
 const AUTH_URL = process.env.AUTH_URL || 'http://localhost:3002';
 const DASH_URL = process.env.DASH_URL || 'http://localhost:3005';
+const ADMIN_URL = process.env.ADMIN_INTERNAL_URL || 'http://localhost:3003';
+
+// CMS content cache (5 minute TTL)
+let cmsCache = { content: null, timestamp: 0 };
+const CMS_CACHE_TTL = 5 * 60 * 1000;
+
+async function fetchCmsContent() {
+    const now = Date.now();
+    if (cmsCache.content && (now - cmsCache.timestamp) < CMS_CACHE_TTL) {
+        return cmsCache.content;
+    }
+
+    try {
+        const response = await fetch(`${ADMIN_URL}/api/v1/public/content`);
+        const data = await response.json();
+        if (data.success) {
+            cmsCache = { content: data.content, timestamp: now };
+            return data.content;
+        }
+    } catch (err) {
+        console.error('Failed to fetch CMS content:', err.message);
+    }
+    return cmsCache.content || {};
+}
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -27,21 +51,25 @@ app.use((req, res, next) => {
     next()
 })
 
-app.get('/', (req, res) => {
-    res.render('pages/home.ejs', { layout: 'layouts/default.ejs' })
+app.get('/', async (req, res) => {
+    const cms = await fetchCmsContent();
+    res.render('pages/home.ejs', { layout: 'layouts/default.ejs', cms: cms.home || {} })
 })
-app.get('/about-us', (req, res) => {
-    res.render('pages/about.ejs', { layout: 'layouts/default.ejs' })
+app.get('/about-us', async (req, res) => {
+    const cms = await fetchCmsContent();
+    res.render('pages/about.ejs', { layout: 'layouts/default.ejs', cms: cms.about || {} })
 })
 app.get('/contact', (req, res) => {
     res.render('pages/contact.ejs', { layout: 'layouts/default.ejs' })
 })
-app.get('/events', (req, res) => {
+app.get('/events', async (req, res) => {
+    const cms = await fetchCmsContent();
     res.render('pages/events.ejs', {
         layout: 'layouts/default.ejs',
         eventsUrl: EVENTS_URL,
         authUrl: AUTH_URL,
-        dashUrl: DASH_URL
+        dashUrl: DASH_URL,
+        cms: cms.events || {}
     })
 })
 app.get('/docs/:tag', (req, res) => {

@@ -4,8 +4,8 @@
 <!-- Page Header -->
 <section class="events-header">
     <div class="events-header-content fade-in">
-        <h1>Upcoming <span class="gradient-text">Events</span></h1>
-        <p>Discover volunteer opportunities and make a difference in your community</p>
+        <h1><%= (typeof cms !== 'undefined' && cms.events_title) || 'Upcoming Events' %></h1>
+        <p><%= (typeof cms !== 'undefined' && cms.events_subtitle) || 'Discover volunteer opportunities and make a difference in your community' %></p>
     </div>
 </section>
 

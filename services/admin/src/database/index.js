@@ -2,6 +2,7 @@ const logger = require('../utils/logger');
 const { sequelize } = require('./database');
 const { User, ORGANIZATION_TYPES, ACCOUNT_STATUSES, ROLES } = require('./models/User');
 const { Settings, SETTING_KEYS, ensureDefaultSettings } = require('./models/Settings');
+const { Content, CONTENT_PAGES, ensureDefaultContent } = require('./models/Content');
 
 async function connectWithRetry(retries = 5, delay = 3000) {
     for (let i = 1; i <= retries; i++) {
@@ -14,6 +15,12 @@ async function connectWithRetry(retries = 5, delay = 3000) {
             await Settings.sync({ alter: true });
             logger.info('Settings table synced, ensuring defaults...');
             await ensureDefaultSettings();
+
+            // Sync content table for CMS
+            logger.info('Syncing Content table...');
+            await Content.sync({ alter: true });
+            logger.info('Content table synced, ensuring defaults...');
+            await ensureDefaultContent();
 
             // Verify settings were created
             const allSettings = await Settings.findAll();
@@ -51,6 +58,8 @@ module.exports = {
     ROLES,
     Settings,
     SETTING_KEYS,
+    Content,
+    CONTENT_PAGES,
     connectWithRetry,
     checkDBHealth,
 };

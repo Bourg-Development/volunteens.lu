@@ -3,6 +3,7 @@ const router = express.Router();
 const indexController = require('../web/indexController');
 const eventsController = require('../web/eventsController');
 const settingsController = require('../web/settingsController');
+const contentController = require('../web/contentController');
 const { requireAdmin } = require('../middleware/auth');
 
 // All routes require admin
@@ -13,6 +14,11 @@ router.get('/', indexController.dashboard);
 // Settings
 router.get('/settings', settingsController.settingsPage);
 router.post('/settings/:key', settingsController.updateSetting);
+
+// Content Management (CMS)
+router.get('/content', contentController.contentPage);
+router.get('/content/:pageKey', contentController.editPageContent);
+router.post('/content/:pageKey', contentController.updatePageContent);
 router.get('/pending', indexController.pending);
 router.get('/users', indexController.usersPage);
 router.get('/users/create', indexController.createUserPage);

@@ -1,0 +1,189 @@
+<div class="content-header">
+    <a href="/content" class="back-link">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Back to Content
+    </a>
+    <h1>Edit <%= pageLabel %></h1>
+</div>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<form action="/content/<%= pageKey %>" method="POST" class="content-form">
+    <% if (pageGroups.length === 0) { %>
+    <div class="card">
+        <p class="empty-message">No editable sections defined for this page yet.</p>
+    </div>
+    <% } else { %>
+    <% pageGroups.forEach(function(group, groupIndex) { %>
+    <div class="card content-group">
+        <h2 class="group-title">
+            <span class="material-symbols-outlined">edit_note</span>
+            <%= group.group %>
+        </h2>
+        <% group.sections.forEach(function(section, index) { %>
+        <div class="form-group <%= index > 0 ? 'form-group-separator' : '' %>">
+            <label for="<%= section.key %>"><%= section.label %></label>
+            <% if (section.type === 'textarea') { %>
+            <textarea
+                id="<%= section.key %>"
+                name="<%= section.key %>"
+                rows="3"
+                class="form-control"
+            ><%= sections[section.key] ? sections[section.key].content : '' %></textarea>
+            <% } else { %>
+            <input
+                type="text"
+                id="<%= section.key %>"
+                name="<%= section.key %>"
+                value="<%= sections[section.key] ? sections[section.key].content : '' %>"
+                class="form-control"
+            >
+            <% } %>
+            <% if (sections[section.key] && sections[section.key].updatedAt) { %>
+            <span class="last-updated">Last updated: <%= new Date(sections[section.key].updatedAt).toLocaleString() %></span>
+            <% } %>
+        </div>
+        <% }); %>
+    </div>
+    <% }); %>
+
+    <div class="form-actions-sticky">
+        <button type="submit" class="btn btn-primary">
+            <span class="material-symbols-outlined">save</span>
+            Save Changes
+        </button>
+        <a href="/content" class="btn btn-secondary">Cancel</a>
+    </div>
+    <% } %>
+</form>
+
+<style>
+.content-header {
+    margin-bottom: 1.5rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #0987c9;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.back-link .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.content-group {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.group-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    color: #0e2f52;
+    margin: 0 0 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #0987c9;
+}
+
+.group-title .material-symbols-outlined {
+    font-size: 22px;
+    color: #0987c9;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group-separator {
+    padding-top: 1.25rem;
+    border-top: 1px solid #eee;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #0e2f52;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #0987c9;
+    box-shadow: 0 0 0 3px rgba(9, 135, 201, 0.1);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.last-updated {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.25rem;
+}
+
+.form-actions-sticky {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    margin: 0 -1rem -1rem;
+    border-top: 1px solid #eee;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    border-radius: 0 0 8px 8px;
+}
+
+.form-actions-sticky .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-actions-sticky .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.empty-message {
+    color: #666;
+    text-align: center;
+    padding: 2rem;
+}
+</style>

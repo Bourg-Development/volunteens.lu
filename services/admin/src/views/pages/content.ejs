@@ -1,0 +1,80 @@
+<h1>Content Management</h1>
+<p style="color: #666; margin-bottom: 1.5rem;">Manage the content displayed on the public website.</p>
+
+<% if (typeof msg !== 'undefined' && msg) { %>
+<div class="alert <%= success ? 'alert-success' : 'alert-error' %>"><%= msg %></div>
+<% } %>
+
+<div class="content-grid">
+    <div class="card content-card">
+        <div class="content-card-icon">
+            <span class="material-symbols-outlined">home</span>
+        </div>
+        <h3>Home Page</h3>
+        <p>Edit hero section, features, mission, story, stats, and CTA content.</p>
+        <a href="/content/home" class="btn btn-primary">Edit Content</a>
+    </div>
+
+    <div class="card content-card">
+        <div class="content-card-icon">
+            <span class="material-symbols-outlined">info</span>
+        </div>
+        <h3>About Page</h3>
+        <p>Edit about hero, who we are, timeline, team, and CTA sections.</p>
+        <a href="/content/about" class="btn btn-primary">Edit Content</a>
+    </div>
+
+    <div class="card content-card">
+        <div class="content-card-icon">
+            <span class="material-symbols-outlined">event</span>
+        </div>
+        <h3>Events Page</h3>
+        <p>Edit the events page header and descriptions.</p>
+        <a href="/content/events" class="btn btn-primary">Edit Content</a>
+    </div>
+</div>
+
+<style>
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.content-card {
+    text-align: center;
+    padding: 2rem;
+}
+
+.content-card-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0987c9, #7ed956);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.content-card-icon .material-symbols-outlined {
+    font-size: 28px;
+    color: white;
+}
+
+.content-card h3 {
+    margin: 0 0 0.5rem;
+    color: #0e2f52;
+}
+
+.content-card p {
+    color: #666;
+    margin: 0 0 1.5rem;
+    font-size: 0.9rem;
+}
+
+.content-card .btn {
+    display: inline-block;
+}
+</style>
